@@ -34,13 +34,13 @@ async function fetchUsersToFollow() {
 }
 
 // Client-side component
-function WhoToFollow({ users }) {
+function WhoToFollow({ users }: any) {
   if (!users || users.length === 0) return null;
 
   return (
     <div className="space-y-5 rounded-2xl bg-card p-5 shadow-sm">
       <div className="text-xl font-bold">Who To Follow</div>
-      {users.map((user) => (
+      {users.map((user: any) => (
         <div key={user.id} className="flex items-center justify-between gap-3">
           <Link
             href={`/users/${user.username}`}
