@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { UserJSON, WebhookEvent } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
@@ -56,12 +56,12 @@ export async function POST(req: Request) {
     }
 
     const clerkId = evt.data.id;
-    const clerkEmail = evt.data.email_addresses[0]?.email_address;
-    const clerkUsername = evt.data.username;
-    const clerkFirstName = evt.data.first_name;
-    const clerkLastName = evt.data.last_name;
+    const clerkEmail = (evt.data as UserJSON).email_addresses[0]?.email_address;
+    const clerkUsername = (evt.data as UserJSON).username || "";
+    const clerkFirstName = (evt.data as UserJSON).first_name;
+    const clerkLastName = (evt.data as UserJSON).last_name;
     const displayName = `${clerkFirstName} ${clerkLastName}`;
-    const clerkProfilePicture = evt.data.image_url;
+    const clerkProfilePicture = (evt.data as UserJSON).image_url;
     const eventType = evt.type;
 
     // Process the "user.created" event type
