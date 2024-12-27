@@ -1,0 +1,17 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "next.config.js",
+        "use": "@vercel/next"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/webhooks/register",
+        "dest": "/api/webhooks/register",
+        "methods": ["POST"]
+      }
+    ]
+  }
+  
