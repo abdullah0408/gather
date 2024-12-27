@@ -63,8 +63,8 @@ function WhoToFollow({ users }) {
   );
 }
 
-async function TrandingTopics() {
+// async function TrandingTopics() {
     
-}
+// }
 
-// export default TrendsSidebar;
+export default TrendsSidebar;
