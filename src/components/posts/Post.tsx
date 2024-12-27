@@ -1,10 +1,20 @@
-import { Post as PostData } from '@prisma/client'
+import { Post as PostData, User } from '@prisma/client'
 import Link from 'next/link';
 import UserAvatar from '../UserAvatar';
 import { formateRelativeDate } from '@/lib/utils';
 
 interface postProps {
-    post: PostData;
+    post: {
+        id: string;
+        content: string;
+        userId: string;
+        createdAt: Date;
+        user: {
+          username: string;
+          displayName: string;
+          avatarUrl: string | null;
+        };
+      };// Correctly type the post with the user
 }
 
 const Post = ({post}: postProps) => {

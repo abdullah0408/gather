@@ -1,16 +1,20 @@
 import Image from "next/image";
 import avatarPlaceholder from "@/assets/avatar-placeholder.png";
 import { cn } from "@/lib/utils";
+
 interface UserAvatarProps {
-  avatarUrl: string;
+  avatarUrl: string | null;
   size?: number;
   className?: string;
 }
 
 const UserAvatar = ({ avatarUrl, size, className }: UserAvatarProps) => {
+  // If avatarUrl is null, use the placeholder image
+  const src = avatarUrl ?? avatarPlaceholder;
+
   return (
     <Image
-      src={avatarUrl}
+      src={src}
       alt="User avatar"
       width={size ?? 48}
       height={size ?? 48}
@@ -23,3 +27,4 @@ const UserAvatar = ({ avatarUrl, size, className }: UserAvatarProps) => {
 };
 
 export default UserAvatar;
+

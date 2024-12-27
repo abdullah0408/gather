@@ -5,21 +5,20 @@ import prisma from '@/lib/prisma'
 import React from 'react'
 
 const page = async () => {
-const posts = await prisma.post.findMany({
-  include: {
-    user : {
-      select: {
-        username: true,
-        displayName: true,
-        avatarUrl: true,
-
+  const posts = await prisma.post.findMany({
+    include: {
+      user: {
+        select: {
+          username: true,
+          displayName: true,
+          avatarUrl: true,
+        },
       },
     },
-  },
-  orderBy: {
-    createdAt: 'desc'
-  }
-});
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
 
   return (
     <main className='w-full min-w-0 flex gap-5'>
