@@ -45,7 +45,7 @@ export default function UserButton({ className }: UserButtonProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>
-          Logged in as @{userDetails?.username}
+          Logged in as @{userDetails?.username || 'User'}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link href={`/profile/${userDetails?.username}`}>
