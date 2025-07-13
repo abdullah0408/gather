@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/elements": "^0.23.38",
     "@clerk/nextjs": "^6.24.0",
     "@hookform/resolvers": "^5.1.1",
     "@prisma/client": "^6.11.1",
