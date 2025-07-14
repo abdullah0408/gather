@@ -12,7 +12,6 @@ export default function UserAvatar({
   className,
   size = 48,
 }: UserAvatarProps) {
-    console.log("UserAvatar rendered with avatarUrl:", avatarUrl);
   return (
     <Image
       src={avatarUrl || "/avatar-placeholder.png"}
