@@ -7,8 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatRelativeCreatedAt(from: Date) {
   const now = new Date();
--  if (now.getTime() - from.getTime() < 24 * 60 * 1000) {
-+  if (now.getTime() - from.getTime() < 24 * 60 * 60 * 1000) {
+  if (now.getTime() - from.getTime() < 24 * 60 * 60 * 1000) {
     return formatDistanceToNowStrict(from, { addSuffix: true });
   } else {
     if (now.getFullYear() === from.getFullYear()) {
