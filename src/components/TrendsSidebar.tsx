@@ -98,7 +98,7 @@ async function TrendingTopics() {
     <div className="space-y-5 rounded-2xl bg-card p-5 shadow-sm">
       <div className="text-xl font-bold">Trending Topics</div>
       {trendingTopics.map(({ hashtag, count }) => {
-        const hashtagText = hashtag.split("#")[1];
+        const hashtagText = hashtag.startsWith("#") ? hashtag.slice(1) : hashtag;
         return (
           <Link
             key={hashtag}
