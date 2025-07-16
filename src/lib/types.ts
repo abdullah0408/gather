@@ -8,3 +8,8 @@ export type PostData = Post & {
     avatarUrl: string | null;
   };
 };
+
+export interface PostsPage {
+  posts: PostData[];
+  nextCursor: string | null;
+}
