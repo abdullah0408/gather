@@ -4,17 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import Post from "./posts/Post";
 import type { PostData } from "@/lib/types";
+import kyInstance from "@/lib/ky";
 
 export default function ForYouFeed() {
   const query = useQuery<PostData[]>({
     queryKey: ["post-feed", "for-you"],
-    queryFn: async () => {
-      const response = await fetch("/api/posts/for-you");
-      if (!response.ok) {
-        throw new Error(`Network response was not ok ${response.status}`);
-      }
-      return response.json();
-    },
+    queryFn: kyInstance.get("api/posts/for-you").json<PostData[]>,
   });
 
   if (query.status === "pending") {
