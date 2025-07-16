@@ -26,6 +26,7 @@ import {
 import { useClerk } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UserButtonProps {
   className?: string;
@@ -35,6 +36,7 @@ export default function UserButton({ className }: UserButtonProps) {
   const { userDetails } = useAuth();
   const { signOut } = useClerk();
   const { theme, setTheme } = useTheme();
+  const QueryClient = useQueryClient();
 
   return (
     <DropdownMenu>
@@ -45,7 +47,7 @@ export default function UserButton({ className }: UserButtonProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>
-          Logged in as @{userDetails?.username || 'User'}
+          Logged in as @{userDetails?.username || "User"}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link href={`/profile/${userDetails?.username}`}>
@@ -80,7 +82,12 @@ export default function UserButton({ className }: UserButtonProps) {
           </DropdownMenuPortal>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut({ redirectUrl: "/sign-in" })}>
+        <DropdownMenuItem
+          onClick={() => {
+            QueryClient.clear();
+            signOut({ redirectUrl: "/sign-in" });
+          }}
+        >
           <LogOutIcon className="mr-2 size-4" />
           Sign Out
         </DropdownMenuItem>
