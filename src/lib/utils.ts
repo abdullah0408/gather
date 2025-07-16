@@ -17,3 +17,10 @@ export function formatRelativeCreatedAt(from: Date) {
     }
   }
 }
+
+export function formatCount(count: number) {
+  return Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(count);
+}
