@@ -9,7 +9,7 @@ import kyInstance from "@/lib/ky";
 export default function ForYouFeed() {
   const query = useQuery<PostData[]>({
     queryKey: ["post-feed", "for-you"],
-    queryFn: kyInstance.get("api/posts/for-you").json<PostData[]>,
+    queryFn: () => kyInstance.get("api/posts/for-you").json<PostData[]>(),
   });
 
   if (query.status === "pending") {
