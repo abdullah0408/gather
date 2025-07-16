@@ -6,6 +6,7 @@ import Post from "./posts/Post";
 import type { PostsPage } from "@/lib/types";
 import kyInstance from "@/lib/ky";
 import InfiniteScrollContainer from "./InfiniteScrollContainer";
+import PostsLoadingSkeleton from "./posts/PostsLoadingSkeleton";
 
 export default function ForYouFeed() {
   const {
@@ -31,7 +32,7 @@ export default function ForYouFeed() {
   const posts = data?.pages.flatMap((page) => page.posts) || [];
 
   if (status === "pending") {
-    return <Loader2 className="mx-auto animate-spin" />;
+    return <PostsLoadingSkeleton />;
   }
 
   if (status === "error") {
@@ -42,8 +43,8 @@ export default function ForYouFeed() {
     );
   }
 
-  if (status === "success" && posts.length === 0) {
-    return <p className="text-center">No posts yet.</p>;
+  if (status === "success" && !posts.length && !hasNextPage) {
+    return <p className="text-center text-muted-foreground">No posts yet.</p>;
   }
 
   return (
