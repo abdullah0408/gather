@@ -111,6 +111,15 @@ export async function POST({
       { status: 401 }
     );
   }
+
+  // Prevent users from following themselves
+  if (authenticatedUserId === userId) {
+    return NextResponse.json(
+      { error: "Cannot follow yourself" },
+      { status: 400 }
+    );
+  }
+
   try {
     //
     // Upsert a follow relationship in the database.
