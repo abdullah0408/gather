@@ -25,12 +25,25 @@ model User {
   avatarUrl String?
   bio       String?
 
-  posts Post[]
+  posts      Post[]
+  followers  Follow[] @relation("Followers")
+  followings Follow[] @relation("Followings")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+model Follow {
+  id          String @id @default(cuid())
+  followerId  String
+  follower    User   @relation("Followings", fields: [followerId], references: [clerkId], onDelete: Cascade)
+  followingId String
+  following   User   @relation("Followers", fields: [followingId], references: [clerkId], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
 }
 
 model Post {
