@@ -19,7 +19,10 @@ import { NextResponse } from "next/server";
  *   404 – Not Found (user with the specified userId not found)
  *   500 – Internal Server Error (unexpected exception)
  */
-export async function GET({ params }: { params: Promise<{ userId: string }> }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   const { userId } = await params;
   // Retrieve Clerk-authenticated user ID from the session.
   // If there’s no valid session, `userId` will be undefined.
@@ -94,11 +97,14 @@ export async function GET({ params }: { params: Promise<{ userId: string }> }) {
  *   401 – Unauthorized (no valid Clerk session)
  *   500 – Internal Server Error (unexpected exception)
  */
-export async function POST({
-  params,
-}: {
-  params: Promise<{ userId: string }>;
-}) {
+export async function POST(
+  request: Request,
+  {
+    params,
+  }: {
+    params: Promise<{ userId: string }>;
+  }
+) {
   const { userId } = await params;
   // Retrieve Clerk-authenticated user ID from the session.
   // If there’s no valid session, `userId` will be undefined.
@@ -168,11 +174,14 @@ export async function POST({
  *   401 – Unauthorized (no valid Clerk session)
  *   500 – Internal Server Error (unexpected exception)
  */
-export async function DELETE({
-  params,
-}: {
-  params: Promise<{ userId: string }>;
-}) {
+export async function DELETE(
+  request: Request,
+  {
+    params,
+  }: {
+    params: Promise<{ userId: string }>;
+  }
+) {
   const { userId } = await params;
   // Retrieve Clerk-authenticated user ID from the session.
   // If there’s no valid session, `userId` will be undefined.
