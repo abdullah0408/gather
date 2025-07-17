@@ -45,7 +45,7 @@ export function useDeletePostMutation() {
     },
     onError(error) {
       console.error("Error deleting post: ", error);
-      toast.error(`Failed delete to post, please try again.`);
+      toast.error(`Failed to delete post, please try again.`);
     },
   });
 
