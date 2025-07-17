@@ -3,10 +3,10 @@ import { auth } from "@clerk/nextjs/server";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Button } from "./ui/button";
 import UserAvatar from "./UserAvatar";
 import { unstable_cache } from "next/cache";
 import { formatCount } from "@/lib/utils";
+import FollowButton from "./FollowButton";
 
 export default function TrendsSidebar() {
   return (
@@ -31,6 +31,11 @@ async function SuggestedUsersList() {
       NOT: {
         clerkId,
       },
+      followers: {
+        none: {
+          followerId: clerkId, // Exclude users already followed by the authenticated user
+        },
+      },
     },
     select: {
       id: true,
@@ -38,6 +43,20 @@ async function SuggestedUsersList() {
       firstName: true,
       lastName: true,
       avatarUrl: true,
+      clerkId: true,
+      followers: {
+        where: {
+          followingId: clerkId, // Only return followers of the authenticated user
+        },
+        select: {
+          followerId: true,
+        },
+      },
+      _count: {
+        select: {
+          followers: true, // Count of followers
+        },
+      },
     },
     take: 5,
   });
@@ -63,7 +82,15 @@ async function SuggestedUsersList() {
               </p>
             </div>
           </Link>
-          <Button>Follow</Button>
+          <FollowButton
+            userId={user.clerkId}
+            initialState={{
+              followers: user._count.followers,
+              isFollowedByUser: user.followers.some(
+                ({ followerId }) => followerId === clerkId
+              ),
+            }}
+          />
         </div>
       ))}
     </div>
@@ -98,7 +125,9 @@ async function TrendingTopics() {
     <div className="space-y-5 rounded-2xl bg-card p-5 shadow-sm">
       <div className="text-xl font-bold">Trending Topics</div>
       {trendingTopics.map(({ hashtag, count }) => {
-        const hashtagText = hashtag.startsWith("#") ? hashtag.slice(1) : hashtag;
+        const hashtagText = hashtag.startsWith("#")
+          ? hashtag.slice(1)
+          : hashtag;
         return (
           <Link
             key={hashtag}
