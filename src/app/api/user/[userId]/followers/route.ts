@@ -42,7 +42,7 @@ export async function GET({ params }: { params: Promise<{ userId: string }> }) {
       select: {
         followers: {
           where: {
-            followingId: authenticatedUserId, // Check if the authenticated user is following the target user
+            followerId: authenticatedUserId, // Check if the authenticated user is following the target user
           },
           select: {
             followerId: true, // Select followerId to determine if a follow relationship exists
