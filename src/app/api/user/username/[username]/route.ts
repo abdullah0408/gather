@@ -79,7 +79,7 @@ export async function GET(
     return NextResponse.json(user, { status: 200 });
   } catch (error) {
     // If anything goes wrong (e.g., database connectivity), log and return 500.
-    console.error("Error fetching posts: ", error);
+    console.error("Error fetching user: ", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
