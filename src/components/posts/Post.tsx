@@ -7,6 +7,7 @@ import { formatRelativeCreatedAt } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import PostMenuButton from "./PostMenuButton";
 import Linkify from "../Linkify";
+import UserTooltip from "../UserTooltip";
 
 interface PostProps {
   post: PostData;
@@ -18,20 +19,24 @@ export default function Post({ post }: PostProps) {
     <article className="group/post space-y-3 rounded-3xl bg-card p-5 shadow-sm">
       <div className="flex justify-between gap-3">
         <div className="flex flex-wrap gap-3">
-          <Link href={`/profile/${post.user.username}`}>
-            <UserAvatar avatarUrl={post.user.avatarUrl} />
-          </Link>
-          <div>
-            <Link
-              href={`/profile/${post.user.username}`}
-              className="block font-medium hover:underline"
-            >
-              {post.user.firstName || post.user.lastName
-                ? `${post.user.firstName ?? ""} ${
-                    post.user.lastName ?? ""
-                  }`.trim()
-                : post.user.username}
+          <UserTooltip user={post.user}>
+            <Link href={`/profile/${post.user.username}`}>
+              <UserAvatar avatarUrl={post.user.avatarUrl} />
             </Link>
+          </UserTooltip>
+          <div>
+            <UserTooltip user={post.user}>
+              <Link
+                href={`/profile/${post.user.username}`}
+                className="block font-medium hover:underline"
+              >
+                {post.user.firstName || post.user.lastName
+                  ? `${post.user.firstName ?? ""} ${
+                      post.user.lastName ?? ""
+                    }`.trim()
+                  : post.user.username}
+              </Link>
+            </UserTooltip>
             <Link
               href={`/post/${post.id}`}
               className="block text-sm text-muted-foreground hover:underline"

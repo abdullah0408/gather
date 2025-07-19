@@ -7,6 +7,7 @@ import UserAvatar from "./UserAvatar";
 import { unstable_cache } from "next/cache";
 import { formatCount } from "@/lib/utils";
 import FollowButton from "./FollowButton";
+import UserTooltip from "./UserTooltip";
 
 export default function TrendsSidebar() {
   return (
@@ -42,6 +43,8 @@ async function SuggestedUsersList() {
       username: true,
       firstName: true,
       lastName: true,
+      bio: true,
+      createdAt: true,
       avatarUrl: true,
       clerkId: true,
       followers: {
@@ -55,6 +58,7 @@ async function SuggestedUsersList() {
       _count: {
         select: {
           followers: true, // Count of followers
+          posts: true, // Count of posts
         },
       },
     },
@@ -66,22 +70,24 @@ async function SuggestedUsersList() {
       <div className="text-xl font-bold">Follow</div>
       {suggestedUsers.map((user) => (
         <div key={user.id} className="flex items-center justify-between gap-3">
-          <Link
-            href={`/profile/${user.username}`}
-            className="flex items-center gap-3"
-          >
-            <UserAvatar avatarUrl={user.avatarUrl} className="flex-none" />
-            <div>
-              <p className="line-clamp-1 break-all font-semibold hover:underline">
-                {user.firstName || user.lastName
-                  ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
-                  : user.username}
-              </p>
-              <p className="line-clamp-1 break-all text-muted-foreground">
-                @{user.username}
-              </p>
-            </div>
-          </Link>
+          <UserTooltip user={user}>
+            <Link
+              href={`/profile/${user.username}`}
+              className="flex items-center gap-3"
+            >
+              <UserAvatar avatarUrl={user.avatarUrl} className="flex-none" />
+              <div>
+                <p className="line-clamp-1 break-all font-semibold hover:underline">
+                  {user.firstName || user.lastName
+                    ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+                    : user.username}
+                </p>
+                <p className="line-clamp-1 break-all text-muted-foreground">
+                  @{user.username}
+                </p>
+              </div>
+            </Link>
+          </UserTooltip>
           <FollowButton
             userId={user.clerkId}
             initialState={{
