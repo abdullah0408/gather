@@ -48,6 +48,21 @@ export async function GET(request: NextRequest) {
             firstName: true,
             lastName: true,
             avatarUrl: true,
+            bio: true,
+            clerkId: true,
+            createdAt: true,
+            id: true,
+            followers: {
+              select: {
+                followerId: true, // Include follower information
+              },
+            },
+            _count: {
+              select: {
+                followers: true,
+                posts: true,
+              },
+            },
           },
         },
       },

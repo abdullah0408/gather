@@ -12,6 +12,7 @@ import FollowersCount from "@/components/FollowersCount";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import UsersPostFeed from "@/components/UsersPostFeed";
+import Linkify from "@/components/Linkify";
 
 const getUser = cache(async (username: string, loggedInUserId: string) => {
   const user = await prisma.user.findFirst({
@@ -160,9 +161,11 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
       {user.bio && (
         <>
           <hr />
-          <div className="whitespace-pre-line overflow-hidden break-words">
-            {user.bio}
-          </div>
+          <Linkify>
+            <div className="whitespace-pre-line overflow-hidden break-words">
+              {user.bio}
+            </div>
+          </Linkify>
         </>
       )}
     </div>

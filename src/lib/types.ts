@@ -6,6 +6,17 @@ export type PostData = Post & {
     firstName: string | null;
     lastName: string | null;
     avatarUrl: string | null;
+    bio: string | null;
+    clerkId: string;
+    createdAt: Date;
+    id: string;
+    followers: {
+      followerId: string;
+    }[];
+    _count: {
+      followers: number;
+      posts: number;
+    };
   };
 };
 

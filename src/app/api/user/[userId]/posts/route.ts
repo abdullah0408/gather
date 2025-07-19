@@ -53,6 +53,21 @@ export async function GET(
             firstName: true,
             lastName: true,
             avatarUrl: true,
+            bio: true,
+            clerkId: true,
+            createdAt: true,
+            id: true,
+            followers: {
+              select: {
+                followerId: true,
+              },
+            },
+            _count: {
+              select: {
+                followers: true,
+                posts: true,
+              },
+            },
           },
         },
       },
