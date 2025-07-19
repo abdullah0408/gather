@@ -6,6 +6,7 @@ import UserAvatar from "../UserAvatar";
 import { formatRelativeCreatedAt } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import PostMenuButton from "./PostMenuButton";
+import Linkify from "../Linkify";
 
 interface PostProps {
   post: PostData;
@@ -46,7 +47,9 @@ export default function Post({ post }: PostProps) {
           />
         )}
       </div>
-      <div className="whitespace-pre-line break-words">{post.content}</div>
+      <Linkify>
+        <div className="whitespace-pre-line break-words">{post.content}</div>
+      </Linkify>
     </article>
   );
 }
