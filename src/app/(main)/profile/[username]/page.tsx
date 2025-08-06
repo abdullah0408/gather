@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import UsersPostFeed from "@/components/UsersPostFeed";
 import Linkify from "@/components/Linkify";
+import EditProfileButton from "@/components/EditProfileButton";
 
 const getUser = cache(async (username: string, loggedInUserId: string) => {
   const user = await prisma.user.findFirst({
@@ -153,7 +154,7 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
           </div>
         </div>
         {user.clerkId === loggedInUserId ? (
-          <Button>Edit Profile</Button>
+          <EditProfileButton user={user} />
         ) : (
           <FollowButton userId={user.clerkId} initialState={followerInfo} />
         )}
