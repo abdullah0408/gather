@@ -42,6 +42,7 @@ export default function Post({ post }: PostProps) {
             <Link
               href={`/post/${post.id}`}
               className="block text-sm text-muted-foreground hover:underline"
+              suppressHydrationWarning
             >
               {formatRelativeCreatedAt(post.createdAt)}
             </Link>
