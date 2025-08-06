@@ -8,7 +8,23 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: ["img.clerk.com"], // Allow images from Clerk's domain
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "img.clerk.com", // Clerk's image hosting
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "uploadthing.com", // Uploadthing's image hosting
+        pathname: `/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID}/*`,
+      },
+      {
+        protocol: "https",
+        hostname: "utfs.io", // Uploadthing's image hosting
+        pathname: `/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID}/*`,
+      },
+    ],
   },
 };
 
