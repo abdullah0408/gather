@@ -1,6 +1,7 @@
-import type { Post } from "@/generated/prisma";
+import type { Media, Post } from "@/generated/prisma";
 
 export type PostData = Post & {
+  attachments: Media[];
   user: {
     username: string;
     firstName: string | null;

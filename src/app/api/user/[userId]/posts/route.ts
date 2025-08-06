@@ -47,6 +47,7 @@ export async function GET(
         userId,
       },
       include: {
+        attachments: true,
         user: {
           select: {
             username: true,

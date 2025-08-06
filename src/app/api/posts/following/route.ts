@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
         },
       },
       include: {
+        attachments: true,
         user: {
           select: {
             username: true,
