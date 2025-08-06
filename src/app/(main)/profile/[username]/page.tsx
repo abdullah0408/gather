@@ -9,7 +9,6 @@ import UserAvatar from "@/components/UserAvatar";
 import { formatDate } from "date-fns";
 import { formatCount } from "@/lib/utils";
 import FollowersCount from "@/components/FollowersCount";
-import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import UsersPostFeed from "@/components/UsersPostFeed";
 import Linkify from "@/components/Linkify";
