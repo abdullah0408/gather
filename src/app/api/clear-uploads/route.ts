@@ -27,7 +27,24 @@ export async function GET(request: Request) {
       },
     });
 
-    new UTApi().deleteFiles(unusedUploads.map((e) => e.url.split(`/f/`)[1]));
+    if (unusedUploads.length === 0) {
+      return NextResponse.json(
+        { message: "No unused uploads found" },
+        { status: 200 }
+      );
+    }
+
+    // Extract file keys, filtering out invalid URLs
+    const fileKeys = unusedUploads
+      .map((upload) => {
+        const parts = upload.url.split('/f/');
+        return parts.length > 1 ? parts[1] : null;
+      })
+      .filter(Boolean);
+
+    if (fileKeys.length > 0) {
+      await new UTApi().deleteFiles(fileKeys);
+    }
 
     await prisma.media.deleteMany({
       where: {
