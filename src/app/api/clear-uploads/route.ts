@@ -40,7 +40,7 @@ export async function GET(request: Request) {
         const parts = upload.url.split('/f/');
         return parts.length > 1 ? parts[1] : null;
       })
-      .filter(Boolean);
+      .filter((key): key is string => Boolean(key));
 
     if (fileKeys.length > 0) {
       await new UTApi().deleteFiles(fileKeys);
