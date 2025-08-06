@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
         hostname: "utfs.io", // Uploadthing's image hosting
         pathname: `/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID}/*`,
       },
+      {
+        protocol: "https",
+        hostname: "3b6348acd4.ufs.sh", // Uploadthing's image hosting
+      }
     ],
   },
 };

@@ -26,26 +26,23 @@ export const fileRouter = {
       return { user };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      const oldAvatarUrl = metadata.user.avatarUrl
+      const oldAvatarUrl = metadata.user.avatarUrl;
 
       if (oldAvatarUrl) {
-        const key = oldAvatarUrl.split(`/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID}/`)[1];
+        const key = oldAvatarUrl.split("/f/")[1];
 
-        await new UTApi().deleteFiles(key);
+        if (key) {
+          await new UTApi().deleteFiles(key);
+        }
       }
-
-      const newAvatarUrl = file.url.replace(
-        "/f/",
-        `/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID}/`
-      );
 
       await prisma.user.update({
         where: { clerkId: metadata.user.clerkId },
-        data: { avatarUrl: newAvatarUrl },
+        data: { avatarUrl: file.url },
       });
 
       return {
-        avatarUrl: newAvatarUrl,
+        avatarUrl: file.url,
       };
     }),
 } satisfies FileRouter;
