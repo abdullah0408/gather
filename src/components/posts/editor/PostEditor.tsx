@@ -6,7 +6,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { useAuth } from "@/hooks/useAuth";
 import UserAvatar from "@/components/UserAvatar";
 import "./styles.css";
-import { useRef, useState } from "react";
+import { type ClipboardEvent, useRef, useState } from "react";
 import { useSubmitPostMutation } from "./mutations";
 import LoadingButton from "@/components/LoadingButton";
 import useMediaUpload, { type Attachment } from "@/hooks/useMediaUpload";
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ImageIcon, Loader2Icon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useDropzone } from "@uploadthing/react";
 
 export default function PostEditor() {
   const { userDetails } = useAuth();
@@ -26,6 +27,13 @@ export default function PostEditor() {
     removeAttachment,
     reset: resetMediaUpload,
   } = useMediaUpload();
+
+  const { getRootProps, getInputProps, isDragAccept } = useDropzone({
+    onDrop: startUpload,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { onClick, ...rootProps } = getRootProps();
 
   const mutation = useSubmitPostMutation();
 
@@ -64,6 +72,14 @@ export default function PostEditor() {
     );
   }
 
+  function onPaste(e: ClipboardEvent<HTMLInputElement>) {
+    const files = Array.from(e.clipboardData.items)
+      .filter((item) => item.kind === "file")
+      .map((item) => item.getAsFile()) as File[];
+
+    if (files.length) startUpload(files);
+  }
+
   return (
     <div className="flex flex-col gap-5 rounded-2xl bg-card p-5 shadow-sm">
       <div className="flex gap-5">
@@ -71,10 +87,17 @@ export default function PostEditor() {
           avatarUrl={userDetails?.avatarUrl}
           className="hidden sm:inline"
         />
-        <EditorContent
-          editor={editor}
-          className="w-full max-h-[20rem] overflow-y-auto bg-background rounded-2xl px-5 py-3"
-        />
+        <div {...rootProps} className="w-full">
+          <EditorContent
+            editor={editor}
+            className={cn(
+              "w-full max-h-[20rem] overflow-y-auto bg-background rounded-2xl px-5 py-3",
+              isDragAccept && "outline-dashed"
+            )}
+            onPaste={onPaste}
+          />
+          <input {...getInputProps()} />
+        </div>
       </div>
       {!!attachments.length && (
         <AttachmentPreviews
