@@ -3,11 +3,13 @@
 import type { PostData } from "@/lib/types";
 import Link from "next/link";
 import UserAvatar from "../UserAvatar";
-import { formatRelativeCreatedAt } from "@/lib/utils";
+import { cn, formatRelativeCreatedAt } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import PostMenuButton from "./PostMenuButton";
 import Linkify from "../Linkify";
 import UserTooltip from "../UserTooltip";
+import { Media } from "@/generated/prisma";
+import Image from "next/image";
 
 interface PostProps {
   post: PostData;
@@ -55,6 +57,58 @@ export default function Post({ post }: PostProps) {
       <Linkify>
         <div className="whitespace-pre-line break-words">{post.content}</div>
       </Linkify>
+      {!!post.attachments.length && (
+        <MediaPreviews attachments={post.attachments} />
+      )}
     </article>
   );
+}
+
+interface MediaPreviewsProps {
+  attachments: Media[];
+}
+
+function MediaPreviews({ attachments }: MediaPreviewsProps) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-3",
+        attachments.length > 1 && "sm:grid sm:grid-cols-2"
+      )}
+    >
+      {attachments.map((attachment) => (
+        <MediaPreview key={attachment.id} attachment={attachment} />
+      ))}
+    </div>
+  );
+}
+
+interface MediaPreviewProps {
+  attachment: Media;
+}
+
+function MediaPreview({ attachment }: MediaPreviewProps) {
+  if (attachment.type === "IMAGE") {
+    return (
+      <Image
+        src={attachment.url}
+        alt="Attachment"
+        width={500}
+        height={500}
+        className="mx-auto size-fit max-h-[30rem] rounded-2xl"
+      />
+    );
+  }
+
+  if (attachment.type === "VIDEO") {
+    return (
+      <video
+        src={attachment.url}
+        controls
+        className="mx-auto size-fit max-h-[30rem] rounded-2xl"
+      />
+    );
+  }
+
+  return <p className="text-destructive">Unsupported media type</p>;
 }

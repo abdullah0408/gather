@@ -16,9 +16,9 @@ export const fileRouter = {
 
       // If not signed in via Clerk, block the request.
       if (!userId) throw new UploadThingError("Unauthorized");
-      
+
       const user = await prisma.user.findUnique({
-        where: { clerkId: userId }
+        where: { clerkId: userId },
       });
 
       if (!user) throw new UploadThingError("User not found");
@@ -44,6 +44,30 @@ export const fileRouter = {
       return {
         avatarUrl: file.url,
       };
+    }),
+  attachment: f({
+    image: { maxFileSize: "4MB", maxFileCount: 5 },
+    video: { maxFileSize: "64MB", maxFileCount: 2 },
+  })
+    .middleware(async () => {
+      // Retrieve Clerk-authenticated user ID from the session.
+      // If there’s no valid session, `userId` will be undefined.
+      const { userId } = await auth();
+
+      // If not signed in via Clerk, block the request.
+      if (!userId) throw new UploadThingError("Unauthorized");
+
+      return {};
+    })
+    .onUploadComplete(async ({ file }) => {
+      const media = await prisma.media.create({
+        data: {
+          url: file.url,
+          type: file.type.toLowerCase().startsWith("image") ? "IMAGE" : "VIDEO",
+        },
+      });
+
+      return { mediaId: media.id };
     }),
 } satisfies FileRouter;
 

@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
     //
     const posts = await prisma.post.findMany({
       include: {
+        attachments: true,
         user: {
           select: {
             username: true,
