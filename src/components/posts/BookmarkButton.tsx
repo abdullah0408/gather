@@ -52,8 +52,13 @@ export default function BookmarkButton({
     },
 
     onSuccess: () => {
+      const newData = queryClient.getQueryData<BookmarkInfo>([
+        "bookmark-info",
+        postId,
+      ]);
+
       toast.success(
-        data.isBookmarkedByUser ? "Post bookmarked" : "Bookmark removed"
+        newData?.isBookmarkedByUser ? "Post bookmarked" : "Bookmark removed"
       );
     },
 
