@@ -48,6 +48,14 @@ export async function GET(
       },
       include: {
         attachments: true,
+        bookmarks: {
+          where: {
+            userId: authenticatedUserId,
+          },
+          select: {
+            userId: true,
+          },
+        },
         likes: {
           where: {
             userId: authenticatedUserId,

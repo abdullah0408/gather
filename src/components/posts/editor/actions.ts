@@ -24,6 +24,14 @@ export async function submitPost(input: {
     },
     include: {
       attachments: true,
+      bookmarks: {
+        where: {
+          userId,
+        },
+        select: {
+          userId: true,
+        },
+      },
       likes: {
         where: {
           userId: userId,

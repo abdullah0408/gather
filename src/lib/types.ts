@@ -2,6 +2,9 @@ import type { Media, Post } from "@/generated/prisma";
 
 export type PostData = Post & {
   attachments: Media[];
+  bookmarks: {
+    userId: string;
+  }[];
   likes: {
     userId: string;
   }[];
@@ -58,4 +61,8 @@ export type UserData = {
 export interface LikeInfo {
   likes: number;
   isLikedByUser: boolean;
+}
+
+export interface BookmarkInfo {
+  isBookmarkedByUser: boolean;
 }

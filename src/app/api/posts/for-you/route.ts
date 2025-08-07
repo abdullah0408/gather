@@ -43,6 +43,14 @@ export async function GET(request: NextRequest) {
     const posts = await prisma.post.findMany({
       include: {
         attachments: true,
+        bookmarks: {
+          where: {
+            userId: authenticatedUserId,
+          },
+          select: {
+            userId: true,
+          },
+        },
         likes: {
           where: {
             userId: authenticatedUserId,

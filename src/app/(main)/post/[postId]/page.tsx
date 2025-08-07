@@ -46,6 +46,14 @@ const getPost = cache(async (postId: string, loggedInUserId: string) => {
         },
       },
       attachments: true,
+      bookmarks: {
+        where: {
+          userId: loggedInUserId,
+        },
+        select: {
+          userId: true,
+        },
+      },
       likes: {
         where: {
           userId: loggedInUserId,
