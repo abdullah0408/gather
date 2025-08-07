@@ -53,6 +53,14 @@ export async function GET(request: NextRequest) {
       },
       include: {
         attachments: true,
+        bookmarks: {
+          where: {
+            userId: authenticatedUserId,
+          },
+          select: {
+            userId: true,
+          },
+        },
         likes: {
           where: {
             userId: authenticatedUserId,

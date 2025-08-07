@@ -26,9 +26,10 @@ model User {
   bio       String?
 
   posts      Post[]
-  followers  Follow[] @relation("Followers")
-  followings Follow[] @relation("Followings")
+  followers  Follow[]   @relation("Followers")
+  followings Follow[]   @relation("Followings")
   likes      Like[]
+  bookmarks  Bookmark[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,12 +49,13 @@ model Follow {
 }
 
 model Post {
-  id          String  @id @default(cuid())
+  id          String     @id @default(cuid())
   content     String
   userId      String
-  user        User    @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
   attachments Media[]
   likes       Like[]
+  bookmarks   Bookmark[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -86,4 +88,17 @@ model Like {
 
   @@unique([userId, postId])
   @@map("likes")
+}
+
+model Bookmark {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@map("bookmarks")
 }
