@@ -53,6 +53,19 @@ export async function GET(request: NextRequest) {
       },
       include: {
         attachments: true,
+        likes: {
+          where: {
+            userId: authenticatedUserId,
+          },
+          select: {
+            userId: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true, // Count the total number of likes for the post
+          },
+        },
         user: {
           select: {
             username: true,

@@ -46,6 +46,19 @@ const getPost = cache(async (postId: string, loggedInUserId: string) => {
         },
       },
       attachments: true,
+      likes: {
+        where: {
+          userId: loggedInUserId,
+        },
+        select: {
+          userId: true,
+        },
+      },
+      _count: {
+        select: {
+          likes: true, // Count the total number of likes for the post
+        },
+      },
     },
   });
 
