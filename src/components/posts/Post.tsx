@@ -67,9 +67,7 @@ export default function Post({ post }: PostProps) {
         postId={post.id}
         initialState={{
           likes: post._count.likes,
-          isLikedByUser: post.likes.some(
-            (like) => like.userId === userDetails?.clerkId
-          ),
+          isLikedByUser: !!post.likes.length,
         }}
       />
     </article>
