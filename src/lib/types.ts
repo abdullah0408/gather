@@ -2,6 +2,12 @@ import type { Media, Post } from "@/generated/prisma";
 
 export type PostData = Post & {
   attachments: Media[];
+  likes: {
+    userId: string;
+  }[];
+  _count: {
+    likes: number; // Count the total number of likes for the post
+  };
   user: {
     username: string;
     firstName: string | null;
@@ -48,3 +54,8 @@ export type UserData = {
     posts: number;
   };
 };
+
+export interface LikeInfo {
+  likes: number;
+  isLikedByUser: boolean;
+}

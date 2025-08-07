@@ -43,6 +43,19 @@ export async function GET(request: NextRequest) {
     const posts = await prisma.post.findMany({
       include: {
         attachments: true,
+        likes: {
+          where: {
+            userId: authenticatedUserId,
+          },
+          select: {
+            userId: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true, // Count the total number of likes for the post
+          },
+        },
         user: {
           select: {
             username: true,
