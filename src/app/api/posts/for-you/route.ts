@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
         _count: {
           select: {
             likes: true, // Count the total number of likes for the post
+            comments: true, // Count the total number of comments for the post
           },
         },
         user: {

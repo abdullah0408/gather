@@ -12,6 +12,9 @@ import { Media } from "@/generated/prisma";
 import Image from "next/image";
 import LikeButton from "./LikeButton";
 import BookmarkButton from "./BookmarkButton";
+import { useState } from "react";
+import { MessageSquareIcon } from "lucide-react";
+import Comments from "../comments/Comments";
 
 interface PostProps {
   post: PostData;
@@ -19,6 +22,8 @@ interface PostProps {
 
 export default function Post({ post }: PostProps) {
   const { userDetails } = useAuth();
+  const [showComments, setShowComments] = useState(false);
+
   return (
     <article className="group/post space-y-3 rounded-3xl bg-card p-5 shadow-sm">
       <div className="flex justify-between gap-3">
@@ -65,13 +70,19 @@ export default function Post({ post }: PostProps) {
       )}
       <hr className="text-muted-foreground" />
       <div className="flex justify-between gap-5">
-        <LikeButton
-          postId={post.id}
-          initialState={{
-            likes: post._count.likes,
-            isLikedByUser: !!post.likes.length,
-          }}
-        />
+        <div className="flex items-center gap-5">
+          <LikeButton
+            postId={post.id}
+            initialState={{
+              likes: post._count.likes,
+              isLikedByUser: !!post.likes.length,
+            }}
+          />
+          <CommentsButton
+            post={post}
+            onClick={() => setShowComments(!showComments)}
+          />
+        </div>
         <BookmarkButton
           postId={post.id}
           initialState={{
@@ -79,6 +90,7 @@ export default function Post({ post }: PostProps) {
           }}
         />
       </div>
+      {showComments && <Comments post={post} />}
     </article>
   );
 }
@@ -130,4 +142,23 @@ function MediaPreview({ attachment }: MediaPreviewProps) {
   }
 
   return <p className="text-destructive">Unsupported media type</p>;
+}
+
+interface CommentsButtonProps {
+  post: PostData;
+  onClick: () => void;
+}
+
+function CommentsButton({ post, onClick }: CommentsButtonProps) {
+  return (
+    <button onClick={onClick} className="flex item-center gap-2 cursor-pointer">
+      <MessageSquareIcon className="size-5" />
+      <span className="text-sm font-medium tabular-nums">
+        {post._count.comments || 0}{" "}
+        <span className="hidden sm:inline">
+          {post._count.comments === 1 ? "comment" : "comments"}
+        </span>
+      </span>
+    </button>
+  );
 }
