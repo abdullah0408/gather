@@ -30,6 +30,7 @@ model User {
   followings Follow[]   @relation("Followings")
   likes      Like[]
   bookmarks  Bookmark[]
+  comments   Comment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -56,6 +57,7 @@ model Post {
   attachments Media[]
   likes       Like[]
   bookmarks   Bookmark[]
+  comments    Comment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -101,4 +103,17 @@ model Bookmark {
 
   @@unique([userId, postId])
   @@map("bookmarks")
+}
+
+model Comment {
+  id      String @id @default(cuid())
+  content String
+  userId  String
+  user    User   @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  postId  String
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("comments")
 }
