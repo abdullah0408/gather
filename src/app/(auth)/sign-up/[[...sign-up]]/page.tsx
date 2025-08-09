@@ -92,24 +92,6 @@ export default function SignUpPage() {
             </SignUp.Action>
           </div>
         </SignUp.Step>
-        <SignUp.Step name="continue">
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2">
-              <Clerk.Field name="username" className="flex flex-col gap-y-2">
-                <Clerk.Label asChild>
-                  <Label>Username</Label>
-                </Clerk.Label>
-                <Clerk.Input asChild>
-                  <Input required />
-                </Clerk.Input>
-                <Clerk.FieldError className="text-red-600 text-sm italic" />
-              </Clerk.Field>
-            </div>
-            <SignUp.Action submit asChild>
-              <Button className="w-full">Sign Up</Button>
-            </SignUp.Action>
-          </div>
-        </SignUp.Step>
         <SignUp.Step name="verifications">
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
