@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { BellIcon, BookmarkIcon, HomeIcon, MailIcon } from "lucide-react";
+import { BookmarkIcon, HomeIcon, MailIcon } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import NotificationsButton from "./NotificationsButton";

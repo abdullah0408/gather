@@ -14,7 +14,7 @@ import { NextResponse } from "next/server";
  *  401 – Unauthorized (no valid Clerk session)
  *  500 – Internal Server Error (unexpected exception)
  */
-export async function GET(request: Request) {
+export async function GET() {
   // Retrieve Clerk-authenticated user ID from the session.
   // If there’s no valid session, `userId` will be undefined.
   const { userId: authenticatedUserId } = await auth();
