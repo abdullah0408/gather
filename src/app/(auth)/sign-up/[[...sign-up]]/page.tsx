@@ -85,18 +85,18 @@ export default function SignUpPage() {
                 <Clerk.FieldError className="text-red-600 text-sm italic" />
               </Clerk.Field>
             </div>
-            <Clerk.Loading>
-              {(isGlobalLoading) => (
-                <SignUp.Action submit asChild>
+            <SignUp.Action submit asChild>
+              <Clerk.Loading>
+                {(isGlobalLoading) => (
                   <Button className="w-full" disabled={isGlobalLoading}>
                     {isGlobalLoading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Sign Up
                   </Button>
-                </SignUp.Action>
-              )}
-            </Clerk.Loading>
+                )}
+              </Clerk.Loading>
+            </SignUp.Action>
           </div>
         </SignUp.Step>
         <SignUp.Step name="continue">
@@ -112,18 +112,18 @@ export default function SignUpPage() {
                 <Clerk.FieldError className="text-red-600 text-sm italic" />
               </Clerk.Field>
             </div>
-            <Clerk.Loading>
-              {(isGlobalLoading) => (
-                <SignUp.Action submit asChild>
+            <SignUp.Action submit asChild>
+              <Clerk.Loading>
+                {(isGlobalLoading) => (
                   <Button className="w-full" disabled={isGlobalLoading}>
                     {isGlobalLoading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Sign Up
                   </Button>
-                </SignUp.Action>
-              )}
-            </Clerk.Loading>
+                )}
+              </Clerk.Loading>
+            </SignUp.Action>
           </div>
         </SignUp.Step>
         <SignUp.Step name="verifications">
@@ -145,18 +145,18 @@ export default function SignUpPage() {
                 </Clerk.Field>
               </SignUp.Strategy>
             </div>
-            <Clerk.Loading>
-              {(isGlobalLoading) => (
-                <SignUp.Action submit asChild>
+            <SignUp.Action submit asChild>
+              <Clerk.Loading>
+                {(isGlobalLoading) => (
                   <Button className="w-full" disabled={isGlobalLoading}>
                     {isGlobalLoading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Verify
                   </Button>
-                </SignUp.Action>
-              )}
-            </Clerk.Loading>
+                )}
+              </Clerk.Loading>
+            </SignUp.Action>
           </div>
         </SignUp.Step>
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -182,7 +182,9 @@ export default function SignUpPage() {
                   />
                 </svg>
               )}
-              {oauthLoading === "github" ? "Please wait..." : "Continue with GitHub"}
+              {oauthLoading === "github"
+                ? "Please wait..."
+                : "Continue with GitHub"}
             </Button>
           </Clerk.Connection>
         </div>
