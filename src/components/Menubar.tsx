@@ -22,15 +22,29 @@ export default async function Menubar({ className }: MenubarProps) {
   let unreadMessagesCount = 0;
 
   if (!!publicMetadata) {
-    [unreadNotificationsCount, unreadMessagesCount] = await Promise.all([
-      prisma.notification.count({
-        where: {
-          recipientId: user.id,
-          read: false, // Only count unread notifications
-        },
-      }),
-      (await streamServerClient.getUnreadCount(user.id)).total_unread_count,
-    ]);
+    try {
+      [unreadNotificationsCount, unreadMessagesCount] = await Promise.all([
+        prisma.notification.count({
+          where: {
+            recipientId: user.id,
+            read: false, // Only count unread notifications
+          },
+        }),
+        streamServerClient.getUnreadCount(user.id).then(result => result.total_unread_count).catch(error => {
+          // If user doesn't exist in Stream yet (common during user sync), return 0
+          if (error && typeof error === "object" && "code" in error && error.code === 16) {
+            console.log("User not found in Stream, returning 0 unread count");
+            return 0;
+          }
+          throw error;
+        }),
+      ]);
+    } catch (error) {
+      console.error("Error fetching counts in Menubar:", error);
+      // Fallback to 0 counts if there's an error
+      unreadNotificationsCount = 0;
+      unreadMessagesCount = 0;
+    }
   }
 
   return (
