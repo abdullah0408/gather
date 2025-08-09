@@ -18,10 +18,6 @@ interface ChatSidebarProps {
 export function ChatSidebar({ open, onClose }: ChatSidebarProps) {
   const { userDetails } = useAuth();
 
-  if (!userDetails) {
-    return null; // or a loading state
-  }
-
   const ChannelPreviewCustom = useCallback(
     (props: ChannelPreviewUIComponentProps) => {
       return (
@@ -36,6 +32,10 @@ export function ChatSidebar({ open, onClose }: ChatSidebarProps) {
     },
     [onClose]
   );
+
+  if (!userDetails) {
+    return null; // or a loading state
+  }
 
   return (
     <div

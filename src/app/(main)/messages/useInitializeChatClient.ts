@@ -47,13 +47,7 @@ export default function useInitializeChatClient() {
           console.log("Disconnected from Stream Chat");
         });
     };
-  }, [
-    userDetails?.avatarUrl,
-    userDetails?.firstName,
-    userDetails?.clerkId,
-    userDetails?.lastName,
-    userDetails?.username,
-  ]);
+  }, [userDetails]);
 
   return chatClient;
 }

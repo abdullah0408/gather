@@ -10,7 +10,6 @@ import UserAvatar from "@/components/UserAvatar";
 import { useAuth } from "@/hooks/useAuth";
 import useDebounce from "@/hooks/useDebounce";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { channel } from "diagnostics_channel";
 import { CheckIcon, Loader2, SearchIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -30,10 +29,6 @@ export default function NewChatDialog({
 
   const { userDetails } = useAuth();
 
-  if (!userDetails) {
-    return null; // or a loading state
-  }
-
   const [searchInput, setSearchInput] = useState("");
 
   const searchInputDebounced = useDebounce(searchInput);
@@ -50,8 +45,8 @@ export default function NewChatDialog({
             { name: { $autocomplete: searchInputDebounced } },
             { id: { $autocomplete: searchInputDebounced } },
           ],
-        } as any,
-        { name: 1, id: 1 } as any,
+        },
+        { name: 1, id: 1 },
         { limit: 15 }
       );
       // Filter out current user from results
@@ -62,11 +57,10 @@ export default function NewChatDialog({
 
   const mutation = useMutation({
     mutationFn: async () => {
+      if (!userDetails) return;
+
       const channel = client.channel("messaging", crypto.randomUUID(), {
-        members: [
-          userDetails?.clerkId,
-          ...selectedUsers.map((user) => user.id),
-        ],
+        members: [userDetails.clerkId, ...selectedUsers.map((user) => user.id)],
       });
 
       await channel.create();
@@ -81,6 +75,10 @@ export default function NewChatDialog({
       toast.error("Failed to create chat channel. Please try again.");
     },
   });
+
+  if (!userDetails) {
+    return null; // or a loading state
+  }
 
   return (
     <Dialog open onOpenChange={onOpenChange}>
@@ -132,7 +130,7 @@ export default function NewChatDialog({
               ))}
             {isSuccess && data.length === 0 && (
               <p className="my-3 text-center text-muted-foreground">
-                No users found matching "{searchInputDebounced}"
+                No users found matching &quot;{searchInputDebounced}&quot;
               </p>
             )}
             {isFetching && <Loader2 className="mx-auto my-3 animate-spin" />}
