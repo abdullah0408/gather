@@ -26,13 +26,14 @@ export default function NewChatDialog({
   onChatCreated,
 }: NewChatDialogProps) {
   const { client, setActiveChannel } = useChatContext();
-
   const { userDetails } = useAuth();
 
+  if (!userDetails) {
+    return null;
+  }
+
   const [searchInput, setSearchInput] = useState("");
-
   const searchInputDebounced = useDebounce(searchInput);
-
   const [selectedUsers, setSelectedUsers] = useState<UserResponse[]>([]);
 
   const { data, isError, isFetching, isSuccess } = useQuery({
