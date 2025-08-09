@@ -139,7 +139,7 @@ export default function SignUpPage() {
             Or
           </span>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4">
           <Clerk.Connection name="github" asChild>
             <Button
               variant="outline"
