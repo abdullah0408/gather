@@ -7,11 +7,27 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState<string | false>(false);
+  const [oauthLoading, setOauthLoading] = useState<string | false>(false);
+
+  // Reset OAuth loading state if user navigates or process completes
+  useEffect(() => {
+    const handleReset = () => {
+      if (oauthLoading) {
+        setOauthLoading(false);
+      }
+    };
+
+    // Reset loading state after a timeout as a fallback
+    const timeoutId = setTimeout(handleReset, 10000); // 10 seconds timeout
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [oauthLoading]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -69,9 +85,18 @@ export default function SignUpPage() {
                 <Clerk.FieldError className="text-red-600 text-sm italic" />
               </Clerk.Field>
             </div>
-            <SignUp.Action submit asChild>
-              <Button className="w-full">Sign Up</Button>
-            </SignUp.Action>
+            <Clerk.Loading>
+              {(isGlobalLoading) => (
+                <SignUp.Action submit asChild>
+                  <Button className="w-full" disabled={isGlobalLoading}>
+                    {isGlobalLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Sign Up
+                  </Button>
+                </SignUp.Action>
+              )}
+            </Clerk.Loading>
           </div>
         </SignUp.Step>
         <SignUp.Step name="continue">
@@ -87,9 +112,18 @@ export default function SignUpPage() {
                 <Clerk.FieldError className="text-red-600 text-sm italic" />
               </Clerk.Field>
             </div>
-            <SignUp.Action submit asChild>
-              <Button className="w-full">Sign Up</Button>
-            </SignUp.Action>
+            <Clerk.Loading>
+              {(isGlobalLoading) => (
+                <SignUp.Action submit asChild>
+                  <Button className="w-full" disabled={isGlobalLoading}>
+                    {isGlobalLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Sign Up
+                  </Button>
+                </SignUp.Action>
+              )}
+            </Clerk.Loading>
           </div>
         </SignUp.Step>
         <SignUp.Step name="verifications">
@@ -111,9 +145,18 @@ export default function SignUpPage() {
                 </Clerk.Field>
               </SignUp.Strategy>
             </div>
-            <SignUp.Action submit asChild>
-              <Button className="w-full">Verify</Button>
-            </SignUp.Action>
+            <Clerk.Loading>
+              {(isGlobalLoading) => (
+                <SignUp.Action submit asChild>
+                  <Button className="w-full" disabled={isGlobalLoading}>
+                    {isGlobalLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Verify
+                  </Button>
+                </SignUp.Action>
+              )}
+            </Clerk.Loading>
           </div>
         </SignUp.Step>
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -126,10 +169,10 @@ export default function SignUpPage() {
             <Button
               variant="outline"
               className="w-full"
-              disabled={!!loading}
-              onClick={() => setLoading("github")}
+              disabled={!!oauthLoading}
+              onClick={() => setOauthLoading("github")}
             >
-              {loading === "github" ? (
+              {oauthLoading === "github" ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
@@ -139,7 +182,7 @@ export default function SignUpPage() {
                   />
                 </svg>
               )}
-              {loading === "github" ? "Please wait..." : "Continue with GitHub"}
+              {oauthLoading === "github" ? "Please wait..." : "Continue with GitHub"}
             </Button>
           </Clerk.Connection>
         </div>

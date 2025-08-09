@@ -11,7 +11,23 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function SignInPage() {
-  const [loading, setLoading] = useState<string | false>(false);
+  const [oauthLoading, setOauthLoading] = useState<string | false>(false);
+
+  // Reset OAuth loading state if user navigates or process completes
+  useEffect(() => {
+    const handleReset = () => {
+      if (oauthLoading) {
+        setOauthLoading(false);
+      }
+    };
+
+    // Reset loading state after a timeout as a fallback
+    const timeoutId = setTimeout(handleReset, 10000); // 10 seconds timeout
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [oauthLoading]);
 
   return (
     <div className="flex flex-col">
@@ -48,9 +64,18 @@ export default function SignInPage() {
                   <Clerk.FieldError className="text-red-600 text-sm italic" />
                 </Clerk.Field>
               </div>
-              <SignUp.Action submit asChild>
-                <Button className="w-full">Continue</Button>
-              </SignUp.Action>
+              <Clerk.Loading>
+                {(isGlobalLoading) => (
+                  <SignUp.Action submit asChild>
+                    <Button className="w-full" disabled={isGlobalLoading}>
+                      {isGlobalLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Continue
+                    </Button>
+                  </SignUp.Action>
+                )}
+              </Clerk.Loading>
             </div>
           </SignIn.Step>
           <SignIn.Step name="verifications">
@@ -74,9 +99,18 @@ export default function SignInPage() {
                     <Clerk.FieldError className="text-red-600 text-sm italic" />
                   </Clerk.Field>
                 </div>
-                <SignIn.Action submit asChild>
-                  <Button className="w-full">Contienu</Button>
-                </SignIn.Action>
+                <Clerk.Loading>
+                  {(isGlobalLoading) => (
+                    <SignIn.Action submit asChild>
+                      <Button className="w-full" disabled={isGlobalLoading}>
+                        {isGlobalLoading && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Continue
+                      </Button>
+                    </SignIn.Action>
+                  )}
+                </Clerk.Loading>
               </div>
             </SignIn.Strategy>
             <SignIn.Strategy name="password">
@@ -98,9 +132,18 @@ export default function SignInPage() {
                     <Clerk.FieldError className="text-red-600 text-sm italic" />
                   </Clerk.Field>
                 </div>
-                <SignIn.Action submit asChild>
-                  <Button className="w-full">Continue</Button>
-                </SignIn.Action>
+                <Clerk.Loading>
+                  {(isGlobalLoading) => (
+                    <SignIn.Action submit asChild>
+                      <Button className="w-full" disabled={isGlobalLoading}>
+                        {isGlobalLoading && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Continue
+                      </Button>
+                    </SignIn.Action>
+                  )}
+                </Clerk.Loading>
               </div>
             </SignIn.Strategy>
             <SignIn.Strategy name="reset_password_email_code">
@@ -123,9 +166,18 @@ export default function SignInPage() {
                     <Clerk.FieldError className="text-red-600 text-sm italic" />
                   </Clerk.Field>
                 </div>
-                <SignIn.Action submit asChild>
-                  <Button className="w-full">Continue</Button>
-                </SignIn.Action>
+                <Clerk.Loading>
+                  {(isGlobalLoading) => (
+                    <SignIn.Action submit asChild>
+                      <Button className="w-full" disabled={isGlobalLoading}>
+                        {isGlobalLoading && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Continue
+                      </Button>
+                    </SignIn.Action>
+                  )}
+                </Clerk.Loading>
               </div>
             </SignIn.Strategy>
           </SignIn.Step>
@@ -166,9 +218,18 @@ export default function SignInPage() {
                   <Clerk.FieldError className="text-red-600 text-sm italic" />
                 </Clerk.Field>
               </div>
-              <SignIn.Action submit asChild>
-                <Button className="w-full">Reset password</Button>
-              </SignIn.Action>
+              <Clerk.Loading>
+                {(isGlobalLoading) => (
+                  <SignIn.Action submit asChild>
+                    <Button className="w-full" disabled={isGlobalLoading}>
+                      {isGlobalLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Reset password
+                    </Button>
+                  </SignIn.Action>
+                )}
+              </Clerk.Loading>
             </div>
           </SignIn.Step>
         </div>
@@ -187,10 +248,10 @@ export default function SignInPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                disabled={!!loading}
-                onClick={() => setLoading("github")}
+                disabled={!!oauthLoading}
+                onClick={() => setOauthLoading("github")}
               >
-                {loading === "github" ? (
+                {oauthLoading === "github" ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
@@ -200,7 +261,7 @@ export default function SignInPage() {
                     />
                   </svg>
                 )}
-                {loading === "github"
+                {oauthLoading === "github"
                   ? "Please wait..."
                   : "Continue with GitHub"}
               </Button>
@@ -240,7 +301,16 @@ const SignUpMissingField = () => {
           </Clerk.Field>
         </div>
         <SignUp.Action submit asChild>
-          <Button className="w-full">Sign Up</Button>
+          <Clerk.Loading>
+            {(isGlobalLoading) => (
+              <Button className="w-full" disabled={isGlobalLoading}>
+                {isGlobalLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Sign Up
+              </Button>
+            )}
+          </Clerk.Loading>
         </SignUp.Action>
       </div>
     </SignUp.Step>
