@@ -84,8 +84,9 @@ export async function GET(
 /**
  * POST /api/posts/{postId}/likes
  *
- * This endpoint allows an authenticated user to like a post. It uses an upsert operation
- * to ensure that a user can only like a post once.
+ * This endpoint allows an authenticated user to like a post.
+ * It uses Prisma to upsert a like entry in the database and creates a notification for the
+ * post owner if the liker is not the post owner.
  *
  * Path Parameters:
  *  postId: The ID of the post to like.
@@ -114,23 +115,58 @@ export async function POST(
 
   try {
     //
-    // Upsert the like entry for the authenticated user and the specified post.
-    // If the like already exists, it will not create a duplicate.
-    // If it doesn't exist, it will create a new like entry.
+    // Check if the post exists and retrieve the userId of the post owner.
+    // This is necessary to avoid notifying the post owner about their own like.
     //
-    await prisma.like.upsert({
+    const post = await prisma.post.findUnique({
       where: {
-        userId_postId: {
+        id: postId,
+      },
+      select: {
+        userId: true, // Get the userId of the post owner
+      },
+    });
+
+    if (!post) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    await prisma.$transaction([
+      //
+      // Upsert the like entry for the authenticated user and the specified post.
+      // If the like already exists, it will not create a duplicate.
+      // If it doesn't exist, it will create a new like entry.
+      //
+      prisma.like.upsert({
+        where: {
+          userId_postId: {
+            userId: authenticatedUserId,
+            postId,
+          },
+        },
+        create: {
           userId: authenticatedUserId,
           postId,
         },
-      },
-      create: {
-        userId: authenticatedUserId,
-        postId,
-      },
-      update: {},
-    });
+        update: {},
+      }),
+      ...(authenticatedUserId !== post.userId
+        ? [
+            //
+            // Create a notification for the post owner if the liker is not the post owner.
+            // This is done conditionally to avoid notifying the post owner about their own like.
+            //
+            prisma.notification.create({
+              data: {
+                issuerId: authenticatedUserId,
+                recipientId: post.userId, // Notify the post owner
+                postId,
+                type: "LIKE",
+              },
+            }),
+          ]
+        : []),
+    ]);
 
     return NextResponse.json(
       { message: "Post liked successfully" },
@@ -149,6 +185,7 @@ export async function POST(
  * DELETE /api/posts/{postId}/likes
  *
  * This endpoint allows an authenticated user to remove their like from a post.
+ * It uses Prisma to delete the like entry from the database and removes the notification for the post owner if it exists.
  *
  * Path Parameters:
  *  postId: The ID of the post to unlike.
@@ -177,14 +214,44 @@ export async function DELETE(
 
   try {
     //
-    // Delete the like entry for the authenticated user and the specified post.
+    // Check if the post exists and retrieve the userId of the post owner.
+    // This is necessary to avoid notifying the post owner about their own like.
     //
-    await prisma.like.deleteMany({
+    const post = await prisma.post.findUnique({
       where: {
-        userId: authenticatedUserId,
-        postId,
+        id: postId,
+      },
+      select: {
+        userId: true, // Get the userId of the post owner
       },
     });
+
+    if (!post) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    await prisma.$transaction([
+      //
+      // Delete the like entry for the authenticated user and the specified post.
+      //
+      prisma.like.deleteMany({
+        where: {
+          userId: authenticatedUserId,
+          postId,
+        },
+      }),
+      //
+      // Delete the notification for the post owner if it exists.
+      //
+      prisma.notification.deleteMany({
+        where: {
+          issuerId: authenticatedUserId,
+          postId,
+          type: "LIKE",
+          recipientId: post.userId,
+        },
+      }),
+    ]);
 
     return NextResponse.json(
       { message: "Like removed successfully" },
