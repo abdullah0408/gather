@@ -28,7 +28,7 @@ export async function GET() {
     );
   }
   const publicMetadata = user?.publicMetadata as User["publicMetadata"];
-  if (publicMetadata?.isDbSynced === false) {
+  if (publicMetadata?.isDbSynced !== true || !publicMetadata?.isDbSynced) {
     const data: MessageCountInfo = {
       unreadCount: 0,
     };
@@ -46,6 +46,21 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching unread messages count:", error);
+
+    // If user doesn't exist in Stream yet (common during user sync), return 0
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === 16
+    ) {
+      console.log("User not found in Stream, returning 0 unread count");
+      const data: MessageCountInfo = {
+        unreadCount: 0,
+      };
+      return NextResponse.json(data, { status: 200 });
+    }
+
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
