@@ -26,7 +26,7 @@ export async function GET() {
   }
 
   try {
-    const expirationTime = Math.floor(Date.now() / 1000) * 60 * 60; // 1 hour from now
+    const expirationTime = Math.floor(Date.now() / 1000) + 60 * 60; // 1 hour from now
 
     const issuedAt = Math.floor(Date.now() / 1000) - 60; // 1 minute ago
 
