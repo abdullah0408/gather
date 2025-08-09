@@ -1,6 +1,7 @@
+import { prisma } from "@/lib/prisma";
 import streamServerClient from "@/lib/stream";
 import type { MessageCountInfo } from "@/lib/types";
-import { currentUser, type User } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 /**
@@ -16,10 +17,9 @@ import { NextResponse } from "next/server";
  */
 export async function GET() {
   // Retrieve Clerk-authenticated user ID from the session.
-  // If there’s no valid session, `user` will be undefined.
-  // If the user is not synced with the database, return an empty count.
-  const user = await currentUser();
-  const authenticatedUserId = user?.id;
+  // If there’s no valid session, `userId` will be undefined.
+  const { userId: authenticatedUserId } = await auth();
+
   // If not signed in via Clerk, block the request.
   if (!authenticatedUserId) {
     return NextResponse.json(
@@ -27,8 +27,14 @@ export async function GET() {
       { status: 401 }
     );
   }
-  const publicMetadata = user?.publicMetadata as User["publicMetadata"];
-  if (publicMetadata?.isDbSynced !== true || !publicMetadata?.isDbSynced) {
+
+  const user = await prisma.user.findUnique({
+    where: { clerkId: authenticatedUserId },
+  });
+
+  // If user is not found in the database, return 0 unread count
+  if (!user) {
+    console.log("User not found in database, returning 0 unread count");
     const data: MessageCountInfo = {
       unreadCount: 0,
     };
