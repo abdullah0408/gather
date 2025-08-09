@@ -86,7 +86,11 @@ export async function POST(req: Request) {
         });
         await streamServerClient.upsertUser({
           id: clerkId,
-          name: `${firstName} ${lastName}`.trim(),
+          name: `${
+            firstName || lastName
+              ? `${firstName ?? ""} ${lastName ?? ""}`.trim()
+              : username
+          }`.trim(),
           username,
           image: avatarUrl,
         });

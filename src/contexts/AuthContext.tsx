@@ -39,23 +39,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchDetails = async (retryCount = 0) => {
       try {
         if (isLoaded && isSignedIn && user) {
-          // Check if user's database sync is complete
-          const isDbSynced = user.publicMetadata?.isDbSynced === true;
-
-          if (!isDbSynced && retryCount < 30) {
-            // If DB is not synced yet, wait and retry (max 30 retries = ~30 seconds)
-            retryTimeout = setTimeout(() => {
-              if (isMounted) {
-                fetchDetails(retryCount + 1);
-              }
-            }, 1000);
-            return;
-          }
-
           const res = await fetch("/api/user/user-details");
+
           if (!res.ok) {
-            // If user is not synced and we get 404, keep retrying for a bit
-            if (res.status === 404 && !isDbSynced && retryCount < 30) {
+            // If user is not found (404) and we haven't exhausted retries, retry every 1 second
+            if (res.status === 404 && retryCount < 10) {
+              console.log(
+                `User not found in database, retrying in 1 second (attempt ${
+                  retryCount + 1
+                }/10)`
+              );
               retryTimeout = setTimeout(() => {
                 if (isMounted) {
                   fetchDetails(retryCount + 1);
@@ -65,8 +58,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }
             throw new Error(`Failed to fetch user details: ${res.status}`);
           }
+
           const prismaUser = await res.json();
-          if (isMounted) setUserDetails(prismaUser);
+          if (isMounted) {
+            setUserDetails(prismaUser);
+            console.log("User details fetched successfully");
+          }
         } else {
           if (isMounted) setUserDetails(null);
         }
@@ -88,7 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         clearTimeout(retryTimeout);
       }
     };
-  }, [isSignedIn, user?.id, user?.publicMetadata?.isDbSynced, isLoaded]);
+  }, [isSignedIn, user?.id, isLoaded]);
 
   return (
     <AuthContext.Provider
