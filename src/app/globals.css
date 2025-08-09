@@ -224,3 +224,18 @@ body {
 .str-chat__channel-search-bar-button--exit-search {
   display: none;
 }
+
+@keyframes spin-and-slow {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  }
+  100% {
+    transform: rotate(360deg);
+    animation-timing-function: ease-out;
+  }
+}
+
+.logo-spin {
+  animation: spin-and-slow 2s forwards;
+}
