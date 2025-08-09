@@ -11,7 +11,11 @@ const isPublicRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, request) => {
   const { userId } = await auth();
 
-  if (userId && isPublicRoute(request)) {
+  if (
+    userId &&
+    (request.nextUrl.pathname.startsWith("/sign-in") ||
+      request.nextUrl.pathname.startsWith("/sign-up"))
+  ) {
     const absoluteUrl = new URL("/", request.url);
     return Response.redirect(absoluteUrl.href);
   }
