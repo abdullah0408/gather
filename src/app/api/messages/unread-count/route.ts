@@ -1,6 +1,6 @@
 import streamServerClient from "@/lib/stream";
 import type { MessageCountInfo } from "@/lib/types";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser, User } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 /**
@@ -16,14 +16,23 @@ import { NextResponse } from "next/server";
  */
 export async function GET() {
   // Retrieve Clerk-authenticated user ID from the session.
-  // If there’s no valid session, `userId` will be undefined.
-  const { userId: authenticatedUserId } = await auth();
+  // If there’s no valid session, `user` will be undefined.
+  // If the user is not synced with the database, return an empty count.
+  const user = await currentUser();
+  const authenticatedUserId = user?.id;
   // If not signed in via Clerk, block the request.
   if (!authenticatedUserId) {
     return NextResponse.json(
       { error: "Unauthorized: no valid session" },
       { status: 401 }
     );
+  }
+  const publicMetadata = user?.publicMetadata as User["publicMetadata"];
+  if (publicMetadata?.isDbSynced === false) {
+    const data: MessageCountInfo = {
+      unreadCount: 0,
+    };
+    return NextResponse.json(data, { status: 200 });
   }
   try {
     const { total_unread_count } = await streamServerClient.getUnreadCount(
