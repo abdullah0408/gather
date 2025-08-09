@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [oauthLoading, setOauthLoading] = useState<string | false>(false);
+  const [isVariablesLoading, setIsVariablesLoading] = useState(false);
 
   // Reset OAuth loading state if user navigates or process completes
   useEffect(() => {
@@ -148,8 +149,16 @@ export default function SignUpPage() {
             <SignUp.Action submit asChild>
               <Clerk.Loading>
                 {(isGlobalLoading) => (
-                  <Button className="w-full" disabled={isGlobalLoading}>
-                    {isGlobalLoading && (
+                  <Button
+                    onClick={
+                      isVariablesLoading
+                        ? undefined
+                        : () => setIsVariablesLoading(true)
+                    }
+                    className="w-full"
+                    disabled={isGlobalLoading}
+                  >
+                    {(isGlobalLoading || isVariablesLoading) && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Verify
