@@ -28,10 +28,6 @@ export default function NewChatDialog({
   const { client, setActiveChannel } = useChatContext();
   const { userDetails } = useAuth();
 
-  if (!userDetails) {
-    return null;
-  }
-
   const [searchInput, setSearchInput] = useState("");
   const searchInputDebounced = useDebounce(searchInput);
   const [selectedUsers, setSelectedUsers] = useState<UserResponse[]>([]);
@@ -78,7 +74,7 @@ export default function NewChatDialog({
   });
 
   if (!userDetails) {
-    return null; // or a loading state
+    return null;
   }
 
   return (
