@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { BookmarkIcon, HomeIcon } from "lucide-react";
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import NotificationsButton from "./NotificationsButton";
 import MessagesButton from "./MessagesButton";
@@ -12,19 +12,26 @@ interface MenubarProps {
 }
 
 export default async function Menubar({ className }: MenubarProps) {
-  const { userId } = await auth();
+  const user = await currentUser();
 
-  if (!userId) return null;
+  if (!user) return null;
 
-  const [unreadNotificationsCount, unreadMessagesCount] = await Promise.all([
-    prisma.notification.count({
-      where: {
-        recipientId: userId,
-        read: false, // Only count unread notifications
-      },
-    }),
-    (await streamServerClient.getUnreadCount(userId)).total_unread_count,
-  ]);
+  const publicMetadata = user.publicMetadata;
+
+  let unreadNotificationsCount = 0;
+  let unreadMessagesCount = 0;
+
+  if (!!publicMetadata) {
+    [unreadNotificationsCount, unreadMessagesCount] = await Promise.all([
+      prisma.notification.count({
+        where: {
+          recipientId: user.id,
+          read: false, // Only count unread notifications
+        },
+      }),
+      (await streamServerClient.getUnreadCount(user.id)).total_unread_count,
+    ]);
+  }
 
   return (
     <div className={className}>
