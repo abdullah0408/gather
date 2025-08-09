@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import streamServerClient from "@/lib/stream";
 import { auth } from "@clerk/nextjs/server";
 import { createUploadthing, FileRouter } from "uploadthing/next";
 import { UploadThingError, UTApi } from "uploadthing/server";
@@ -35,6 +36,19 @@ export const fileRouter = {
           await new UTApi().deleteFiles(key);
         }
       }
+
+      await Promise.all([
+        await prisma.user.update({
+          where: { clerkId: metadata.user.clerkId },
+          data: { avatarUrl: file.url },
+        }),
+        streamServerClient.partialUpdateUser({
+          id: metadata.user.clerkId,
+          set: {
+            image: file.url,
+          },
+        }),
+      ]);
 
       await prisma.user.update({
         where: { clerkId: metadata.user.clerkId },

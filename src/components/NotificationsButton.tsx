@@ -27,18 +27,20 @@ export default function NotificationsButton({
   return (
     <Button
       variant="ghost"
-      className="relative flex items-center justify-start gap-3"
+      className="flex items-center justify-start gap-3"
       title="Notifications"
       asChild
     >
       <Link href="/notifications">
-        {/* Badge inside button */}
-        {!!data?.unreadCount && data.unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 rounded-full bg-primary text-primary-foreground px-1 text-xs font-medium tabular-nums">
-            {data.unreadCount > 99 ? "99+" : data.unreadCount}
-          </span>
-        )}
-        <BellIcon />
+        <div className="relative">
+          {/* Badge inside button */}
+          <BellIcon />
+          {!!data?.unreadCount && data.unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 rounded-full bg-primary text-primary-foreground px-1 text-xs font-medium tabular-nums">
+              {data.unreadCount > 99 ? "99+" : data.unreadCount}
+            </span>
+          )}
+        </div>
         <span className="hidden lg:inline">Notifications</span>
       </Link>
     </Button>
