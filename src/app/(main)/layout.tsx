@@ -1,6 +1,17 @@
+import type { Metadata } from "next";
+
 import Menubar from "@/components/Menubar";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/contexts/AuthContext";
+
+export const metadata: Metadata = {
+  title: {
+    template: "%s | Gather",
+    default: "Gather",
+  },
+  description:
+    "Gather is a social media platform where you can connect with friends, share your thoughts, and discover new content.",
+};
 
 export default function RootLayout({
   children,
