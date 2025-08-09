@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { BookmarkIcon, HomeIcon, MailIcon } from "lucide-react";
+import { BookmarkIcon, HomeIcon } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import NotificationsButton from "./NotificationsButton";
+import MessagesButton from "./MessagesButton";
+import streamServerClient from "@/lib/stream";
 
 interface MenubarProps {
   className?: string;
@@ -14,12 +16,15 @@ export default async function Menubar({ className }: MenubarProps) {
 
   if (!userId) return null;
 
-  const unreadNotificationsCount = await prisma.notification.count({
-    where: {
-      recipientId: userId,
-      read: false, // Only count unread notifications
-    },
-  });
+  const [unreadNotificationsCount, unreadMessagesCount] = await Promise.all([
+    prisma.notification.count({
+      where: {
+        recipientId: userId,
+        read: false, // Only count unread notifications
+      },
+    }),
+    (await streamServerClient.getUnreadCount(userId)).total_unread_count,
+  ]);
 
   return (
     <div className={className}>
@@ -30,24 +35,16 @@ export default async function Menubar({ className }: MenubarProps) {
         asChild
       >
         <Link href="/">
-          <HomeIcon />
+          <div className="relative">
+            <HomeIcon />
+          </div>
           <span className="hidden lg:inline">Home</span>
         </Link>
       </Button>
       <NotificationsButton
         initialState={{ unreadCount: unreadNotificationsCount }}
       />
-      <Button
-        variant="ghost"
-        className="flex items-center justify-start gap-3"
-        title="Messages"
-        asChild
-      >
-        <Link href="/messages">
-          <MailIcon />
-          <span className="hidden lg:inline">Messages</span>
-        </Link>
-      </Button>
+      <MessagesButton initialState={{ unreadCount: unreadMessagesCount }} />
       <Button
         variant="ghost"
         className="flex items-center justify-start gap-3"
@@ -55,7 +52,9 @@ export default async function Menubar({ className }: MenubarProps) {
         asChild
       >
         <Link href="/bookmarks">
-          <BookmarkIcon />
+          <div className="relative">
+            <BookmarkIcon />
+          </div>
           <span className="hidden lg:inline">Bookmarks</span>
         </Link>
       </Button>
