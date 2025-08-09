@@ -1,6 +1,6 @@
 import streamServerClient from "@/lib/stream";
 import type { MessageCountInfo } from "@/lib/types";
-import { auth, currentUser, User } from "@clerk/nextjs/server";
+import { currentUser, type User } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 /**
