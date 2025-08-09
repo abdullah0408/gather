@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { WebhookEvent, clerkClient } from "@clerk/nextjs/server";
 import { UserJSON as DefaultUserJSON } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import streamServerClient from "@/lib/stream";
@@ -90,6 +90,14 @@ export async function POST(req: Request) {
           username,
           image: avatarUrl,
         });
+      });
+
+      // Update Clerk user's publicMetadata to signal database sync completion
+      const clerk = await clerkClient();
+      await clerk.users.updateUser(clerkId, {
+        publicMetadata: {
+          isDbSynced: true,
+        },
       });
 
       return new Response(`User created: ${username}`, { status: 201 });

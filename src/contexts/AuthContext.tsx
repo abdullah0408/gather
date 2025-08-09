@@ -34,12 +34,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Track if the component is still mounted to prevent state updates after unmount
     let isMounted = true;
+    let retryTimeout: NodeJS.Timeout;
 
-    const fetchDetails = async () => {
+    const fetchDetails = async (retryCount = 0) => {
       try {
-        if (isLoaded && isSignedIn) {
+        if (isLoaded && isSignedIn && user) {
+          // Check if user's database sync is complete
+          const isDbSynced = user.publicMetadata?.isDbSynced === true;
+
+          if (!isDbSynced && retryCount < 30) {
+            // If DB is not synced yet, wait and retry (max 30 retries = ~30 seconds)
+            retryTimeout = setTimeout(() => {
+              if (isMounted) {
+                fetchDetails(retryCount + 1);
+              }
+            }, 1000);
+            return;
+          }
+
           const res = await fetch("/api/user/user-details");
           if (!res.ok) {
+            // If user is not synced and we get 404, keep retrying for a bit
+            if (res.status === 404 && !isDbSynced && retryCount < 30) {
+              retryTimeout = setTimeout(() => {
+                if (isMounted) {
+                  fetchDetails(retryCount + 1);
+                }
+              }, 1000);
+              return;
+            }
             throw new Error(`Failed to fetch user details: ${res.status}`);
           }
           const prismaUser = await res.json();
@@ -61,8 +84,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // so we don't try to update state after it's gone.
     return () => {
       isMounted = false;
+      if (retryTimeout) {
+        clearTimeout(retryTimeout);
+      }
     };
-  }, [isSignedIn, user, isLoaded]);
+  }, [isSignedIn, user?.id, user?.publicMetadata?.isDbSynced, isLoaded]);
 
   return (
     <AuthContext.Provider
