@@ -74,7 +74,7 @@ export async function POST(req: Request) {
       }
 
       await prisma.$transaction(async (tx) => {
-        await prisma.user.create({
+        await tx.user.create({
           data: {
             clerkId,
             email,
