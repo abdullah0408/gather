@@ -9,6 +9,13 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  const { userId } = await auth();
+
+  if (userId && isPublicRoute(request)) {
+    const absoluteUrl = new URL("/", request.url);
+    return Response.redirect(absoluteUrl.href);
+  }
+
   if (!isPublicRoute(request)) {
     await auth.protect();
   }
