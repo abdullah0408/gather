@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { UserJSON as DefaultUserJSON } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import streamServerClient from "@/lib/stream";
 
 interface UserJSON extends DefaultUserJSON {
   birthday: string | null;
@@ -72,16 +73,26 @@ export async function POST(req: Request) {
         });
       }
 
-      await prisma.user.create({
-        data: {
-          clerkId,
-          email,
+      await prisma.$transaction(async (tx) => {
+        await prisma.user.create({
+          data: {
+            clerkId,
+            email,
+            username,
+            firstName,
+            lastName,
+            avatarUrl,
+          },
+        });
+        await streamServerClient.upsertUser({
+          id: clerkId,
+          name: `${firstName} ${lastName}`.trim(),
           username,
-          firstName,
-          lastName,
-          avatarUrl,
-        },
+          image: avatarUrl,
+        });
       });
+
+      return new Response(`User created: ${username}`, { status: 201 });
     } catch (error) {
       return new Response(`Error creating user: ${error}`, { status: 500 });
     }
