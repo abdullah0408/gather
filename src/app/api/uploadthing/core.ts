@@ -50,11 +50,6 @@ export const fileRouter = {
         }),
       ]);
 
-      await prisma.user.update({
-        where: { clerkId: metadata.user.clerkId },
-        data: { avatarUrl: file.url },
-      });
-
       return {
         avatarUrl: file.url,
       };
