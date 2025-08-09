@@ -88,9 +88,9 @@ export async function POST(req: Request) {
           id: clerkId,
           name: `${
             firstName || lastName
-              ? `${firstName ?? ""} ${lastName ?? ""}`.trim()
+              ? `${firstName ?? ""} ${lastName ?? ""}`.trim() || username
               : username
-          }`.trim(),
+          }`,
           username,
           image: avatarUrl,
         });
