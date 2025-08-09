@@ -97,3 +97,31 @@ export interface CommentsPage {
   comments: CommentData[];
   previousCursor: string | null;
 }
+
+export type NotificationData = {
+  id: string;
+  recipientId: string;
+  issuerId: string;
+  postId: string | null;
+  type: "FOLLOW" | "LIKE" | "COMMENT";
+  read: boolean;
+  createdAt: Date;
+  issuer: {
+    username: string;
+    firstName: string | null;
+    lastName: string | null;
+    avatarUrl: string | null;
+  };
+  post: {
+    content: string;
+  } | null;
+};
+
+export interface NotificationsPage {
+  notifications: NotificationData[];
+  nextCursor: string | null;
+}
+
+export interface NotificationCountInfo {
+  unreadCount: number;
+}

@@ -18,41 +18,64 @@ export async function submitComment({
 
   const { content: validatedContent } = createCommentSchema.parse({ content });
 
-  const newComment = await prisma.comment.create({
-    data: {
-      content: validatedContent,
-      postId: post.id,
-      userId,
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          username: true,
-          firstName: true,
-          lastName: true,
-          avatarUrl: true,
-          bio: true,
-          clerkId: true,
-          createdAt: true,
-          followers: {
-            where: {
-              followerId: userId,
+  //
+  // Create a new comment in the database.
+  // If the post's userId is the same as the authenticated userId,
+  // it will not create a notification for the post owner.
+  // If the post's userId is different, it will create a notification for the post owner.
+  //
+  const [newComment] = await prisma.$transaction([
+    prisma.comment.create({
+      data: {
+        content: validatedContent,
+        postId: post.id,
+        userId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+            bio: true,
+            clerkId: true,
+            createdAt: true,
+            followers: {
+              where: {
+                followerId: userId,
+              },
+              select: {
+                followerId: true,
+              },
             },
-            select: {
-              followerId: true,
-            },
-          },
-          _count: {
-            select: {
-              posts: true,
-              followers: true,
+            _count: {
+              select: {
+                posts: true,
+                followers: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    }),
+    ...(post.userId !== userId
+      ? [
+          //
+          // Create a notification for the post owner if the commenter is not the post owner.
+          //
+          prisma.notification.create({
+            data: {
+              issuerId: userId,
+              recipientId: post.userId,
+              type: "COMMENT",
+              postId: post.id,
+            },
+          }),
+        ]
+      : []),
+  ]);
 
   return newComment;
 }

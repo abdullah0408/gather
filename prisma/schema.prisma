@@ -25,12 +25,14 @@ model User {
   avatarUrl String?
   bio       String?
 
-  posts      Post[]
-  followers  Follow[]   @relation("Followers")
-  followings Follow[]   @relation("Followings")
-  likes      Like[]
-  bookmarks  Bookmark[]
-  comments   Comment[]
+  posts                 Post[]
+  followers             Follow[]       @relation("Followers")
+  followings            Follow[]       @relation("Followings")
+  likes                 Like[]
+  bookmarks             Bookmark[]
+  comments              Comment[]
+  notificationsIssued   Notification[] @relation("Issuer")
+  notificationsReceived Notification[] @relation("Recipient")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -50,14 +52,15 @@ model Follow {
 }
 
 model Post {
-  id          String     @id @default(cuid())
-  content     String
-  userId      String
-  user        User       @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
-  attachments Media[]
-  likes       Like[]
-  bookmarks   Bookmark[]
-  comments    Comment[]
+  id                  String         @id @default(cuid())
+  content             String
+  userId              String
+  user                User           @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  attachments         Media[]
+  likes               Like[]
+  bookmarks           Bookmark[]
+  comments            Comment[]
+  linkedNotifications Notification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -116,4 +119,26 @@ model Comment {
   createdAt DateTime @default(now())
 
   @@map("comments")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  recipient   User             @relation("Recipient", fields: [recipientId], references: [clerkId], onDelete: Cascade)
+  issuerId    String
+  issuer      User             @relation("Issuer", fields: [issuerId], references: [clerkId], onDelete: Cascade)
+  postId      String?
+  post        Post?            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  read        Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  FOLLOW
+  LIKE
+  COMMENT
 }

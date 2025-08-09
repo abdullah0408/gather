@@ -88,6 +88,7 @@ export async function GET(
  *
  * This endpoint allows the authenticated user to follow another user.
  * It relies on Clerk’s `auth()` function to verify the user’s session.
+ * It uses Prisma to upsert a follow entry in the database and creates a notification for the user being followed.
  *
  * Path Parameters:
  *   userId (required): The Clerk ID of the user to be followed.
@@ -127,24 +128,36 @@ export async function POST(
   }
 
   try {
-    //
-    // Upsert a follow relationship in the database.
-    // If the relationship already exists, it will not create a duplicate.
-    // If it doesn't exist, it will create a new follow record.
-    //
-    await prisma.follow.upsert({
-      where: {
-        followerId_followingId: {
+    await prisma.$transaction([
+      //
+      // Upsert a follow relationship in the database.
+      // If the relationship already exists, it will not create a duplicate.
+      // If it doesn't exist, it will create a new follow record.
+      //
+      prisma.follow.upsert({
+        where: {
+          followerId_followingId: {
+            followerId: authenticatedUserId,
+            followingId: userId,
+          },
+        },
+        create: {
           followerId: authenticatedUserId,
           followingId: userId,
         },
-      },
-      create: {
-        followerId: authenticatedUserId,
-        followingId: userId,
-      },
-      update: {},
-    });
+        update: {},
+      }),
+      //
+      // Create a notification for the user being followed.
+      //
+      prisma.notification.create({
+        data: {
+          issuerId: authenticatedUserId,
+          recipientId: userId,
+          type: "FOLLOW",
+        },
+      }),
+    ]);
 
     return NextResponse.json(
       { message: "Followed successfully" },
@@ -164,6 +177,8 @@ export async function POST(
  * DELETE /api/user/[userId]/followers
  *
  * This endpoint allows the authenticated user to unfollow another user.
+ * It uses Prisma to delete the follow entry from the database
+ * and removes the notification for the follow relationship if it exists.
  * It relies on Clerk’s `auth()` function to verify the user’s session.
  *
  * Path Parameters:
@@ -195,16 +210,28 @@ export async function DELETE(
     );
   }
   try {
-    //
-    // Delete the follow relationship from the database.
-    // This will remove the follow record where the authenticated user is the follower and the target user is the following.
-    //
-    await prisma.follow.deleteMany({
-      where: {
-        followerId: authenticatedUserId,
-        followingId: userId,
-      },
-    });
+    await prisma.$transaction([
+      //
+      // Delete the follow relationship from the database.
+      // This will remove the follow record where the authenticated user is the follower and the target user is the following.
+      //
+      prisma.follow.deleteMany({
+        where: {
+          followerId: authenticatedUserId,
+          followingId: userId,
+        },
+      }),
+      //
+      // Remove the notification for the follow relationship if it exists.
+      //
+      prisma.notification.deleteMany({
+        where: {
+          issuerId: authenticatedUserId,
+          recipientId: userId,
+          type: "FOLLOW",
+        },
+      }),
+    ]);
 
     return NextResponse.json(
       { message: "Unfollowed successfully" },
