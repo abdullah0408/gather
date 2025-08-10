@@ -40,10 +40,11 @@ export default function NewChatDialog({
         {
           $or: [
             { name: { $autocomplete: searchInputDebounced } },
+            { username: { $autocomplete: searchInputDebounced } },
             { id: { $autocomplete: searchInputDebounced } },
           ],
         },
-        { name: 1, id: 1 },
+        { name: 1, username: 1, id: 1 },
         { limit: 15 }
       );
       // Filter out current user from results
