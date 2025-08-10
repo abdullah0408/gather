@@ -55,11 +55,15 @@ export function ChatSidebar({ open, onClose }: ChatSidebarProps) {
         sort={{ last_message_at: -1 }}
         additionalChannelSearchProps={{
           searchForChannels: true,
+          searchForUsers: true,
           searchQueryParams: {
             channelFilters: {
               filters: {
                 members: { $in: [userDetails?.clerkId] },
               },
+            },
+            userFilters: {
+              filters: {},
             },
           },
         }}
