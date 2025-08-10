@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   },
   description:
     "Gather is a social media platform where you can connect with friends, share your thoughts, and discover new content.",
+  icons: {
+    icon: "logo.png",
+  },
 };
 
 export default function RootLayout({
