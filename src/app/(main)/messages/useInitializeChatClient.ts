@@ -20,7 +20,7 @@ export default function useInitializeChatClient() {
         {
           id: userDetails?.clerkId,
           username: userDetails?.username,
-          name: (userDetails?.firstName + " " + userDetails?.lastName).trim(),
+          name: userDetails?.username,
           image: userDetails?.avatarUrl || undefined,
         },
         async () =>
