@@ -49,7 +49,7 @@ export async function updateUserProfile(values: updateUserProfileValues) {
     await streamServerClient.partialUpdateUser({
       id: updatedUser.clerkId,
       set: {
-        name: (updatedUser.firstName + " " + updatedUser.lastName).trim(),
+        name: updatedUser.username,
       },
     });
     return updatedUser;
