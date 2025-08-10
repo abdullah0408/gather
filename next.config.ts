@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
   rewrites: async () => {
     return [
       {
-        source: "/hashtads/:hashtag",
+        source: "/hashtag/:hashtag",
         destination: "/search?q=%23:hashtag",
       },
     ];
