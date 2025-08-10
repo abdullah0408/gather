@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         clearTimeout(retryTimeout);
       }
     };
-  }, [isSignedIn, user?.id, isLoaded]);
+  }, [isSignedIn, user, isLoaded]);
 
   return (
     <AuthContext.Provider

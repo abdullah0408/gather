@@ -24,8 +24,16 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "3b6348acd4.ufs.sh", // Uploadthing's image hosting
-      }
+      },
     ],
+  },
+  rewrites: async () => {
+    return [
+      {
+        source: "/hashtads/:hashtag",
+        destination: "/search?q=%23:hashtag",
+      },
+    ];
   },
 };
 
