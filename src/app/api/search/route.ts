@@ -35,12 +35,14 @@ export async function GET(request: NextRequest) {
           {
             content: {
               contains: q, // Use contains for content search
+              mode: "insensitive",
             },
           },
           {
             user: {
               username: {
                 contains: q, // Use contains for username search
+                mode: "insensitive",
               },
             },
           },
@@ -48,6 +50,7 @@ export async function GET(request: NextRequest) {
             user: {
               firstName: {
                 contains: q, // Use contains for first name search
+                mode: "insensitive",
               },
             },
           },
@@ -55,6 +58,7 @@ export async function GET(request: NextRequest) {
             user: {
               lastName: {
                 contains: q, // Use contains for last name search
+                mode: "insensitive",
               },
             },
           },
