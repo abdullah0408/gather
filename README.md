@@ -21,7 +21,7 @@ Gather is a modern social media application designed for building communities an
 - [x] **Follow System:** Follow and unfollow other users to customize your social feed.
 - [x] **Real-time Messaging:** One-on-one and group chat functionality powered by Stream.
 - [x] **Notifications:** Receive notifications for likes, new followers, and other interactions.
-- [x] **Image Uploads:** Upload profile pictures and other media using UploadThing.
+- [x] **Image Uploads:** Upload profile pictures and other media using ImageKit (migrated from UploadThing).
 - [x] **Global Search:** Search for users and posts across the platform.
 
 ## Tech Stack
@@ -35,7 +35,7 @@ Gather is a modern social media application designed for building communities an
 | **State Management** | [TanStack Query](https://tanstack.com/query/latest) |
 | **Database ORM** | [Prisma](https://www.prisma.io/) |
 | **Authentication** | [Clerk](https://clerk.com/) |
-| **File Uploads** | [UploadThing](https://uploadthing.com/) |
+| **File Uploads** | [ImageKit](https://imagekit.io/) (migrated from [UploadThing](https://uploadthing.com/)) |
 | **Real-time Chat** | [Stream](https://getstream.io/chat/) |
 | **Deployment** | [Vercel](https://vercel.com/) |
 
@@ -92,8 +92,11 @@ The following variables are required to run the application. These should be pla
 | `CLERK_SECRET_KEY` | Your secret API key from the Clerk dashboard. |
 | `CLERK_WEBHOOK_SECRET_KEY` | The secret for verifying Clerk webhooks. |
 | `NEXT_PUBLIC_APP_URL` | The full URL of your application (e.g., `http://localhost:3000`). |
-| `UPLOADTHING_SECRET` | Your secret API key from the UploadThing dashboard. |
-| `NEXT_PUBLIC_UPLOADTHING_APP_ID` | Your app ID from the UploadThing dashboard. |
+| `UPLOADTHING_SECRET` | Your secret API key from the UploadThing dashboard. (Deprecated: Last used in commit e6aa0e0, migrated to ImageKit) |
+| `NEXT_PUBLIC_UPLOADTHING_APP_ID` | Your app ID from the UploadThing dashboard. (Deprecated: Last used in commit e6aa0e0, migrated to ImageKit) |
+| `IMAGEKIT_PUBLIC_KEY` | Your public API key from the ImageKit dashboard. |
+| `IMAGEKIT_PRIVATE_KEY` | Your private API key from the ImageKit dashboard. |
+| `IMAGEKIT_URL_ENDPOINT` | Your ImageKit URL endpoint. |
 | `CRON_SECRET` | A secret key to secure cron job endpoints. |
 | `STREAM_KEY` | Your API key from the Stream dashboard. |
 | `STREAM_SECRET` | Your API secret from the Stream dashboard. |
@@ -130,7 +133,8 @@ The project uses the Next.js App Router for routing and project structure.
 │   │   ├── ky.ts           # Ky HTTP client instance
 │   │   ├── prisma.ts       # Prisma client instance
 │   │   ├── stream.ts       # Stream chat client initialization
-│   │   ├── uploadthing.ts  # UploadThing helper utilities
+│   │   ├── imageKit.ts     # ImageKit SDK initialization
+│   │   ├── uploadthing.ts  # UploadThing helper utilities (Deprecated: Last used in commit e6aa0e0, migrated to ImageKit)
 │   │   ├── utils.ts        # General utility functions
 │   │   └── validation.ts   # Zod validation schemas
 │   └── middleware.ts       # Edge middleware for authentication
@@ -142,6 +146,8 @@ The project uses the Next.js App Router for routing and project structure.
 ## Key Components
 
 This section describes the functionality of major components that are central to the application's features.
+
+> **Migration Note**: The application has recently migrated from UploadThing to ImageKit for file uploads. This change improves media handling capabilities and provides a more robust solution for user uploads. UploadThing was last used in commit [e6aa0e0](https://github.com/abdullah0408/gather/commit/e6aa0e0).
 
 | Component | Description |
 | :--- | :--- |
@@ -173,7 +179,7 @@ The backend is built with Next.js API Routes. Here are the main endpoints:
 | `/api/messages/unread-count` | `GET` | Gets the count of unread messages. |
 | `/api/search` | `GET` | Searches for users and posts based on a query string. |
 | `/api/get-token` | `GET` | Generates a token for the Stream chat client. |
-| `/api/uploadthing` | `POST` | Handles file uploads, managed by the UploadThing library. |
+| `/api/uploadthing` | `POST` | Handles file uploads, managed by the UploadThing library. (Deprecated: Last used in commit e6aa0e0, migrated to ImageKit) |
 | `/api/clerk/webhooks` | `POST` | Receives webhooks from Clerk to sync user data with the database. |
 
 ## Available Scripts
