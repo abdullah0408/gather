@@ -1,4 +1,3 @@
-import { useUploadThing } from "@/lib/uploadthing";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -10,57 +9,9 @@ export interface Attachment {
 
 export default function useMediaUpload() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const [uploadProgress, setUploadProgress] = useState<number>();
-
-  const { startUpload, isUploading } = useUploadThing("attachment", {
-    onBeforeUploadBegin(files) {
-      const renamedFiles = files.map((file) => {
-        const extension = file.name.split(".").pop();
-
-        return new File(
-          [file],
-          `attachment_${crypto.randomUUID()}.${extension}`,
-          { type: file.type }
-        );
-      });
-      setAttachments((prev) => [
-        ...prev,
-        ...renamedFiles.map((file) => ({
-          file,
-          isUploading: true,
-        })),
-      ]);
-
-      return renamedFiles;
-    },
-    onUploadProgress: setUploadProgress,
-    onClientUploadComplete(res) {
-      setAttachments((prev) =>
-        prev.map((attachment) => {
-          const uploadResult = res.find(
-            (result) => result.name === attachment.file.name
-          );
-          if (!uploadResult) return attachment;
-
-          return {
-            ...attachment,
-            mediaId: uploadResult.serverData.mediaId,
-            isUploading: false,
-          };
-        })
-      );
-    },
-    onUploadError(error) {
-      setAttachments((prev) =>
-        prev.filter((attachment) => !attachment.isUploading)
-      );
-
-      toast.error(error.message || "Failed to upload media");
-    },
-  });
-
-  function handleStartUpload(files: File[]) {
+  async function handleStartUpload(files: File[]) {
     if (isUploading) {
       toast.error("Please wait for the current upload to finish.");
       return;
@@ -71,7 +22,53 @@ export default function useMediaUpload() {
       return;
     }
 
-    startUpload(files);
+    setIsUploading(true);
+
+    const newAttachments = files.map((file) => ({
+      file,
+      isUploading: true,
+    }));
+    setAttachments((prev) => [...prev, ...newAttachments]);
+
+    try {
+      for (const attachment of newAttachments) {
+        const formData = new FormData();
+        formData.append("file", attachment.file);
+
+        const response = await fetch("/api/imagekit", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to upload file");
+        }
+
+        const result = await response.json();
+
+        setAttachments((prev) =>
+          prev.map((a) =>
+            a.file.name === attachment.file.name
+              ? {
+                  ...a,
+                  mediaId: result.id,
+                  isUploading: false,
+                }
+              : a
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to upload media:", error);
+      toast.error("Failed to upload media.");
+      setAttachments((prev) =>
+        prev.filter(
+          (a) => !newAttachments.some((na) => na.file.name === a.file.name)
+        )
+      );
+    } finally {
+      setIsUploading(false);
+    }
   }
 
   function removeAttachment(fileName: string) {
@@ -82,12 +79,10 @@ export default function useMediaUpload() {
 
   function reset() {
     setAttachments([]);
-    setUploadProgress(undefined);
   }
 
   return {
     attachments,
-    uploadProgress,
     isUploading,
     startUpload: handleStartUpload,
     removeAttachment,

@@ -10,20 +10,11 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
+        hostname: "ik.imagekit.io", // ImageKit's image hosting
+      },
+      {
         protocol: "https",
         hostname: "img.clerk.com", // Clerk's image hosting
-      },
-      {
-        protocol: "https",
-        hostname: "uploadthing.com", // Uploadthing's image hosting
-      },
-      {
-        protocol: "https",
-        hostname: "utfs.io", // Uploadthing's image hosting
-      },
-      {
-        protocol: "https",
-        hostname: "3b6348acd4.ufs.sh", // Uploadthing's image hosting
       },
     ],
   },

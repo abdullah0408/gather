@@ -1,5 +1,11 @@
 import type { UserData } from "@/lib/types";
-import {DialogTitle, Dialog, DialogContent, DialogFooter, DialogHeader } from "./ui/dialog";
+import {
+  DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "./ui/dialog";
 import { useForm } from "react-hook-form";
 import {
   updateUserProfileSchema,
@@ -52,12 +58,17 @@ export default function EditProfileDialog({
   const [croppedAvatar, setCroppedAvatar] = useState<Blob | null>(null);
 
   async function onSubmit(values: updateUserProfileValues) {
-    const newAvatarFile = croppedAvatar ? new File([croppedAvatar], `avatar_${user.clerkId}.webp`) : undefined;
+    // Generate a UUID for the avatar filename
+    const uuid = crypto.randomUUID();
+    const newAvatarFile = croppedAvatar
+      ? new File([croppedAvatar], `avatar_${uuid}.webp`)
+      : undefined;
 
     mutation.mutate(
       {
         values,
         avatar: newAvatarFile,
+        uuid, // Pass the UUID to the mutation
       },
       {
         onSuccess: () => {

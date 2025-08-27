@@ -7,8 +7,13 @@ import {
   type updateUserProfileValues,
 } from "@/lib/validation";
 import { auth } from "@clerk/nextjs/server";
+import { imagekit } from "@/lib/imageKit";
 
-export async function updateUserProfile(values: updateUserProfileValues) {
+export async function updateUserProfile(
+  values: updateUserProfileValues,
+  avatar?: File,
+  uuid?: string
+) {
   const validationValues = updateUserProfileSchema.parse(values);
 
   const { userId } = await auth();
@@ -17,10 +22,28 @@ export async function updateUserProfile(values: updateUserProfileValues) {
     throw new Error("User not authenticated");
   }
 
+  let avatarUrl: string | undefined = undefined;
+
+  if (avatar) {
+    // Use the provided UUID or generate a new one
+    const fileId = uuid || crypto.randomUUID();
+    const fileBuffer = await avatar.arrayBuffer();
+    const response = await imagekit.upload({
+      file: Buffer.from(fileBuffer),
+      fileName: `avatar_${fileId}.webp`,
+      useUniqueFileName: false,
+      folder: "avatars",
+    });
+    avatarUrl = response.url;
+  }
+
   const updatedUser = await prisma.$transaction(async (tx) => {
     const updatedUser = await tx.user.update({
       where: { clerkId: userId },
-      data: validationValues,
+      data: {
+        ...validationValues,
+        avatarUrl: avatarUrl || validationValues.avatarUrl,
+      },
       select: {
         id: true,
         username: true,
@@ -50,6 +73,7 @@ export async function updateUserProfile(values: updateUserProfileValues) {
       id: updatedUser.clerkId,
       set: {
         name: updatedUser.username,
+        image: updatedUser.avatarUrl || undefined,
       },
     });
     return updatedUser;

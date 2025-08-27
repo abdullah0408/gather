@@ -1,4 +1,3 @@
-import { useUploadThing } from "@/lib/uploadthing";
 import type { updateUserProfileValues } from "@/lib/validation";
 import {
   type InfiniteData,
@@ -7,33 +6,47 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { updateUserProfile } from "./actions";
 import type { PostsPage } from "@/lib/types";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 export function useUpdateProfileMutation() {
   const router = useRouter();
+  const { refetch } = useAuth();
 
   const queryClient = useQueryClient();
-
-  const { startUpload: startAvatarUpload } = useUploadThing("avatar");
 
   const mutation = useMutation({
     mutationFn: async ({
       values,
       avatar,
+      uuid,
     }: {
       values: updateUserProfileValues;
       avatar?: File;
+      uuid?: string;
     }) => {
-      return Promise.all([
-        updateUserProfile(values),
-        avatar && startAvatarUpload([avatar]),
-      ]);
-    },
-    onSuccess: async ([updateUser, uploadResult]) => {
-      const newAvatarUrl = uploadResult?.[0].serverData.avatarUrl;
+      const formData = new FormData();
+      formData.append("values", JSON.stringify(values));
+      if (avatar) {
+        formData.append("avatar", avatar);
+      }
+      if (uuid) {
+        formData.append("uuid", uuid);
+      }
 
+      const response = await fetch("/api/user/user-details", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      return response.json();
+    },
+    onSuccess: async (updatedUser) => {
       const queryFilter: QueryFilters = {
         queryKey: ["post-feed"],
       };
@@ -50,13 +63,10 @@ export function useUpdateProfileMutation() {
             pages: oldData.pages.map((page) => ({
               nextCursor: page.nextCursor,
               posts: page.posts.map((post) => {
-                if (post.user.clerkId === updateUser.clerkId) {
+                if (post.user.clerkId === updatedUser.clerkId) {
                   return {
                     ...post,
-                    user: {
-                      ...updateUser,
-                      avatarUrl: newAvatarUrl || updateUser.avatarUrl,
-                    },
+                    user: updatedUser,
                   };
                 }
                 return post;
@@ -65,6 +75,10 @@ export function useUpdateProfileMutation() {
           };
         }
       );
+
+      // Refresh user data after successful profile update
+      await refetch();
+
       router.refresh();
 
       toast.success("Profile updated successfully");
