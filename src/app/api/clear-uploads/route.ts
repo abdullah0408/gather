@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { UTApi } from "uploadthing/server";
+import { imagekit } from "@/lib/imageKit";
+
+const BATCH_SIZE = 50;
 
 export async function GET(request: Request) {
   try {
@@ -23,7 +25,7 @@ export async function GET(request: Request) {
       },
       select: {
         id: true,
-        url: true,
+        fileId: true,
       },
     });
 
@@ -34,25 +36,23 @@ export async function GET(request: Request) {
       );
     }
 
-    // Extract file keys, filtering out invalid URLs
-    const fileKeys = unusedUploads
-      .map((upload) => {
-        const parts = upload.url.split('/f/');
-        return parts.length > 1 ? parts[1] : null;
-      })
-      .filter((key): key is string => Boolean(key));
+    for (let i = 0; i < unusedUploads.length; i += BATCH_SIZE) {
+      const batch = unusedUploads.slice(i, i + BATCH_SIZE);
 
-    if (fileKeys.length > 0) {
-      await new UTApi().deleteFiles(fileKeys);
-    }
+      const fileIds = batch.map((upload) => upload.fileId);
 
-    await prisma.media.deleteMany({
-      where: {
-        id: {
-          in: unusedUploads.map((e) => e.id),
+      if (fileIds.length > 0) {
+        await imagekit.bulkDeleteFiles(fileIds);
+      }
+
+      await prisma.media.deleteMany({
+        where: {
+          id: {
+            in: batch.map((e) => e.id),
+          },
         },
-      },
-    });
+      });
+    }
 
     return NextResponse.json(
       { message: "Unused uploads cleared successfully" },

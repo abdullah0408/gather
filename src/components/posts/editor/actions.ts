@@ -14,6 +14,20 @@ export async function submitPost(input: {
 
   const { content, mediaIds } = createPostSchema.parse(input);
 
+  if (mediaIds && mediaIds.length > 0) {
+    const media = await prisma.media.findMany({
+      where: {
+        id: {
+          in: mediaIds,
+        },
+      },
+    });
+
+    if (media.length !== mediaIds.length) {
+      throw new Error("Invalid media IDs");
+    }
+  }
+
   const newPost = await prisma.post.create({
     data: {
       content,

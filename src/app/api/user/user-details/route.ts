@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { updateUserProfile } from "@/app/(main)/profile/[username]/actions";
 
 /**
  * GET /api/user/user-details
@@ -45,6 +46,25 @@ export async function GET() {
   } catch (error) {
     // If anything goes wrong (e.g., database connectivity), log and return 500.
     console.error("Error fetching user details: ", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const formData = await req.formData();
+    const values = JSON.parse(formData.get("values") as string);
+    const avatar = formData.get("avatar") as File | undefined;
+    const uuid = formData.get("uuid") as string | undefined;
+
+    const updatedUser = await updateUserProfile(values, avatar, uuid);
+
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user details: ", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

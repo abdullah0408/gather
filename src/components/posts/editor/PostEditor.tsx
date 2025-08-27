@@ -14,26 +14,17 @@ import { Button } from "@/components/ui/button";
 import { ImageIcon, Loader2Icon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { useDropzone } from "@uploadthing/react";
 
 export default function PostEditor() {
   const { userDetails } = useAuth();
   const [content, setContent] = useState("");
   const {
     attachments,
-    uploadProgress,
     isUploading,
     startUpload,
     removeAttachment,
     reset: resetMediaUpload,
   } = useMediaUpload();
-
-  const { getRootProps, getInputProps, isDragAccept } = useDropzone({
-    onDrop: startUpload,
-  });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { onClick, ...rootProps } = getRootProps();
 
   const mutation = useSubmitPostMutation();
 
@@ -87,16 +78,12 @@ export default function PostEditor() {
           avatarUrl={userDetails?.avatarUrl}
           className="hidden sm:inline"
         />
-        <div {...rootProps} className="w-full">
+        <div className="w-full">
           <EditorContent
             editor={editor}
-            className={cn(
-              "w-full max-h-[20rem] overflow-y-auto bg-background rounded-2xl px-5 py-3",
-              isDragAccept && "outline-dashed"
-            )}
+            className="w-full max-h-[20rem] overflow-y-auto bg-background rounded-2xl px-5 py-3"
             onPaste={onPaste}
           />
-          <input {...getInputProps()} />
         </div>
       </div>
       {!!attachments.length && (
@@ -107,12 +94,7 @@ export default function PostEditor() {
       )}
       <div className="flex justify-end gap-3 items-center">
         {isUploading && (
-          <>
-            <span>
-              {uploadProgress ?? 0}%
-              <Loader2Icon className="size-5 animate-spin text-primary" />
-            </span>
-          </>
+          <Loader2Icon className="size-5 animate-spin text-primary" />
         )}
         <AddAttachmentsButton
           onFilesSelected={startUpload}
