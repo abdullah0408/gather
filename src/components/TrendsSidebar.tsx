@@ -25,8 +25,6 @@ async function SuggestedUsersList() {
 
   if (!clerkId) return null;
 
-  await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate loading delay
-
   const suggestedUsers = await prisma.user.findMany({
     where: {
       NOT: {
