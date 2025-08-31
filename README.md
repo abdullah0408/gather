@@ -98,7 +98,7 @@ The following variables are required to run the application. These should be pla
 | `IMAGEKIT_PRIVATE_KEY` | Your private API key from the ImageKit dashboard. |
 | `IMAGEKIT_URL_ENDPOINT` | Your ImageKit URL endpoint. |
 | `CRON_SECRET` | A secret key to secure cron job endpoints. |
-| `STREAM_KEY` | Your API key from the Stream dashboard. |
+| `NEXT_PUBLIC_STREAM_KEY` | Your API key from the Stream dashboard. |
 | `STREAM_SECRET` | Your API secret from the Stream dashboard. |
 
 ## Project Structure
